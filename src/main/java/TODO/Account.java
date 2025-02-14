@@ -13,7 +13,7 @@ public class Account {
     private ArrayList<String> minors;
 
     // Constructor
-    public Account (String username, String password, String email, ArrayList<String> majors, ArrayList<String> minors) {
+    public Account (String username, String password, String email) {
         //TODO: Implement Constructor
     }
 

@@ -10,6 +10,9 @@ public class Search {
     private ArrayList<Class> filterResults;
 
     // Constructor
+    public Search(){
+        //TODO: Implement Constructor
+    }
 
     // Methods
     public ArrayList<Class> search(String query) {
