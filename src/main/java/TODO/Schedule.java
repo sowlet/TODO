@@ -9,7 +9,7 @@ public class Schedule {
     private String name;
 
     // Constructor
-    public Schedule(String name) {
+    public Schedule(String name, ArrayList<Class> classes) {
         //TODO: Implement Constructor
     }
 
