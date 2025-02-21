@@ -11,7 +11,10 @@ public class Search {
 
     // Constructor
     public Search(){
-        //TODO: Implement Constructor
+        searchResults = new ArrayList<>();
+        query = "";
+        filters= new ArrayList<>();
+        filterResults = new ArrayList<>();
     }
 
     // Methods
