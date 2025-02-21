@@ -1,4 +1,4 @@
-package TODO.Entities;
+package TODO;
 
 public class Class
 {

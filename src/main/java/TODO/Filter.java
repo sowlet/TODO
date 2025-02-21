@@ -1,4 +1,4 @@
-package TODO.Entities;
+package TODO;
 
 import java.util.ArrayList;
 
