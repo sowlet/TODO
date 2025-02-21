@@ -9,35 +9,46 @@ public class Schedule {
     private String name;
 
     // Constructor
-    public Schedule(String name) {
-        //TODO: Implement Constructor
+    public Schedule(String newName) {
+        changeName(newName);
     }
 
     // Methods
     public ArrayList<Class> getClasses() {
-        //TODO: Implement getClasses
-        return null;
+        return classes;
     }
 
     public String getName() {
-        //TODO: Implement getName
-        return null;
+        return name;
     }
 
-    public void changeName(){
-        //TODO: Implement changeName
+    public void changeName(String newName){
+        //TODO: add checks to limit user input
+        name = newName;
     }
 
     public void addClass(Class c) {
-        //TODO: Implement addClass
+        if (!hasTimeConflict(c)) {
+            classes.add(c);
+        }
     }
 
     public void removeClass(Class c){
         //TODO: Implement removeClass
+        if(hasClass(c)) {
+            for(int i = 0; i < classes.size(); i++) {
+
+            }
+        }
     }
 
     public boolean hasClass(Class c){
         //TODO: Implement hasClass
+        return false;
+    }
+
+    public boolean hasTimeConflict(Class c) {
+        //TODO: Implement hasTimeConflict
         return false;
     }
 }

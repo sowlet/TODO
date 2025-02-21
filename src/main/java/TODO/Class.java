@@ -11,10 +11,10 @@ public class Class
     private String days;
     private String time;
     private double rating;
-    private int numRatings;
+    private int numOfRatings;
 
     // Constructor
-    public Class(String className, String courseCode, char section, String profName, String description, String days, String time, double rating, int numRatings)
+    public Class(String className, String courseCode, char section, String profName, String description, String days, String time, double rating, int numOfRatings)
     {
         //TODO: Implement Constructor
     }

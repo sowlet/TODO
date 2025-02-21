@@ -33,7 +33,7 @@ public class Account {
         //TODO: Implement setUsername
     }
 
-    public void setPassword(String password){
+    public void setPassword(String pswd){
         //TODO: Implement setPassword
     }
 
