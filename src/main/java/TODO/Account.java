@@ -14,51 +14,56 @@ public class Account {
 
     // Constructor
     public Account (String username, String password, String email) {
-        //TODO: Implement Constructor
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.classesTaken = new ArrayList<Class>();
+        this.schedules = new ArrayList<Schedule>();
+        this.majors = new ArrayList<String>();
+        this.minors = new ArrayList<String>();
     }
 
     // Methods
     public void addTakenClass(Class c) {
-        //TODO: Implement addTakenClass
+        classesTaken.add(c);
     }
     public void removeTakenClass(Class c){
-        //TODO: Implement removeTakenClass
+        classesTaken.remove(c);
     }
 
     public String getUsername(){
-        //TODO: Implement getUsername
-        return null;
+        return this.username;
     }
     public void setUsername(String username){
-        //TODO: Implement setUsername
+        this.username = username;
     }
 
     public void setPassword(String password){
-        //TODO: Implement setPassword
+        this.password = password;
     }
 
     public void setEmail(String email){
-        //TODO: Implement setEmail
+        this.email = email;
     }
 
     public void addSchedule(String name){
-        //TODO: Implement addSchedule
+        this.schedules.add(new Schedule(name));
     }
     public void removeSchedule(String name){
-        //TODO: Implement removeSchedule
+        this.schedules.remove(name);
     }
 
     public void addMajor(String major){
-        //TODO: Implement addMajor
+        this.majors.add(major);
     }
     public void removeMajor(String major){
-        //TODO: Implement removeMajor
+        this.majors.remove(major);
     }
 
     public void addMinor(String minor){
-        //TODO: Implement addMinor
+        this.minors.add(minor);
     }
     public void removeMinor(String minor){
-        //TODO: Implement removeMinor
+        this.minors.remove(minor);
     }
 }
