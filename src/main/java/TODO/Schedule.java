@@ -34,21 +34,34 @@ public class Schedule {
     }
 
     public void removeClass(Class c){
-        //TODO: Implement removeClass
         if(hasClass(c)) {
-            for(int i = 0; i < classes.size(); i++) {
+            //If this works
+            classes.remove(c);
 
-            }
+            //Buf if it doesn't, we can use this, though at that point, we might as well eliminate the hasClass method and combine them
+//            for(int i = 0; i < classes.size(); i++) {
+//                if((c.getCourseCode().equals(classes.get(i).getCourseCode())) && (c.getSection() == classes.get(i).getSection())) {
+//                    classes.remove(i);
+//                }
+//            }
         }
     }
 
     public boolean hasClass(Class c){
-        //TODO: Implement hasClass
+        for(int i = 0; i < classes.size(); i++) {
+                if((c.getCourseCode().equals(classes.get(i).getCourseCode())) && (c.getSection() == classes.get(i).getSection())) {
+                    return true;
+                }
+        }
         return false;
     }
 
     public boolean hasTimeConflict(Class c) {
-        //TODO: Implement hasTimeConflict
+        for(int i = 0; i < classes.size(); i++) {
+            if((c.getDays().equals(classes.get(i).getDays())) && (c.getTime().equals(classes.get(i).getTime()))) {
+                return true;
+            }
+        }
         return false;
     }
 }
