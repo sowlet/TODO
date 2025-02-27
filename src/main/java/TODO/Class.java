@@ -2,71 +2,130 @@ package TODO;
 
 public class Class
 {
-    // Variables
-    private String className;
-    private String courseCode;
+    // Variables (same name and order as in the data file)
+    private int credits;
+    private String[] faculty;
+    private boolean is_lab;
+    private boolean is_open;
+    private String location;
+    private String name;
+    private int number;
+    private int open_seats;
     private char section;
-    private String profName;
-    private String description;
-    private String days;
-    private String time;
+    private String semester;
+    private String subject;
+    private ClassTime[] times;
+    private int totalSeats;
+
+    //Variables (not from data file)
     private double rating;
     private int numRatings;
 
     // Constructor
-    public Class(String className, String courseCode, char section, String profName, String description, String days, String time, double rating, int numRatings)
-    {
-        //TODO: Implement Constructor
+    public Class(int credits, String[] faculty, boolean is_lab, boolean is_open, String location, String name, int number, int open_seats, char section, String semester, String subject, ClassTime[] times, int totalSeats){
+        this.credits = credits;
+        this.faculty = faculty;
+        this.is_lab = is_lab;
+        this.is_open = is_open;
+        this.location = location;
+        this.name = name;
+        this.number = number;
+        this.open_seats = open_seats;
+        this.section = section;
+        this.semester = semester;
+        this.subject = subject;
+        this.times = times;
+        this.totalSeats = totalSeats;
+
+        this.rating = 0;
+        this.numRatings = 0;
     }
 
-    // Methods
-    public void giveRating(double score){
-        //TODO: Implement giveRating
+    // Getters
+    public int getCredits() {
+        return credits;
     }
 
-    public String getClassName(){
-        //TODO: Implement getClassName
-        return null;
+    public String[] getFaculty() {
+        return faculty;
     }
 
-    public String getCourseCode(){
-        //TODO: Implement getCourseCode
-        return null;
+    public boolean getIsLab() {
+        return is_lab;
     }
 
-    public char getSection(){
-        //TODO: Implement getSection
-        return 'f';
+    public boolean getIsOpen() {
+        return is_open;
     }
 
-    public String getProfName(){
-        //TODO: Implement getProfName
-        return null;
+    public String getLocation() {
+        return location;
     }
 
-    public String getDescription(){
-        //TODO: Implement getDescription
-        return null;
+    public String getName() {
+        return name;
     }
 
-    public String getDays(){
-        //TODO: Implement getDays
-        return null;
+    public int getNumber() {
+        return number;
     }
 
-    public String getTime(){
-        //TODO Implement getTime
-        return null;
+    public int getOpenSeats() {
+        return open_seats;
+    }
+
+    public char getSection() {
+        return section;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public ClassTime[] getTimes() {
+        return times;
+    }
+
+    public int getTotalSeats() {
+        return totalSeats;
     }
 
     public double getRating(){
-        //TODO Implement getRating
-        return 0;
+        return rating;
     }
 
-    public boolean hasTimeConflict(Class c){
-        //TODO Implement hasTimeConflict
-        return false;
+
+    //method to recalulate the class rating based on input
+    public int giveRating(double newRating){
+
+        if (newRating >= 0 && newRating <= 5){
+            rating = (rating * numRatings + newRating) / (numRatings + 1);
+            numRatings ++;
+            return 0;
+        }
+        return -1;
+
+    }
+
+    //method to check if the class has a time conflict with another class
+    public boolean hasTimeConflict(Class otherClass){
+        boolean conflict = false;
+
+        for (ClassTime time : this.times){
+            for (ClassTime otherTime : otherClass.times){
+                if (time.getDay().equals(otherTime.getDay())){
+                    if ((time.getStartTime().compareTo(otherTime.getEndTime()) < 0 && time.getEndTime().compareTo(otherTime.getStartTime()) > 0) || (otherTime.getStartTime().compareTo(time.getEndTime()) < 0 && otherTime.getEndTime().compareTo(time.getStartTime()) > 0)){
+                        conflict = true;
+                    }
+                }
+            }
+        }
+
+        return conflict;
     }
 
 }
