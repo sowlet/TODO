@@ -10,6 +10,8 @@ class SearchTest {
     @Test
     void basicSearch() {
         ArrayList<Class> sampleClasses = new ArrayList<>();
+
+        // dummy parody data named -> Course 1, Course 2, Course 3
         String json1 = "{\n" +
                 "            \"credits\": 0,\n" +
                 "            \"faculty\": [\n" +
