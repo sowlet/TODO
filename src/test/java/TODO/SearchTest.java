@@ -72,6 +72,7 @@ class SearchTest {
         ArrayList<Class> results = s.search("COURSE 1",sampleClasses);
 
         assertEquals(1, results.size());
+        assertEquals("COURSE 1", results.get(0).getName());
     }
 
     @Test

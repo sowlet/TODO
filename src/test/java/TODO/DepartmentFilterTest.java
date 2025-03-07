@@ -79,5 +79,7 @@ class DepartmentFilterTest {
         ArrayList<Class> results = f.filt(sampleClasses);
 
         assertEquals(2, results.size());
+        assertEquals("COURSE 2", results.get(0).getName());
+        assertEquals("COURSE 3", results.get(1).getName());
     }
 }
