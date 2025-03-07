@@ -42,18 +42,37 @@ class DepartmentFilter extends Filter {
 
 
 
-// filters by Date
+// filters by Date -> MWF or TTR
 class DateFilter extends Filter {
     private Day days;
 
     public DateFilter(Day days) {
-        //TODO: Implement filter by department
+        super();
+        this.days = days;
     }
 
     @Override
     public ArrayList<Class> filt(ArrayList<Class> classes) {
-        //TODO
-        return null;
+        ArrayList<Class> fClasses = new ArrayList<>();
+
+        for (Class c: classes) {
+            for (ClassTime t: c.getTimes()) {
+                switch(days) {
+                    case MWF:
+                        if (t.getDay().equals("M") || t.getDay().equals("W") || t.getDay().equals("F")) {
+                            fClasses.add(c);
+                        }
+                        break;
+                    case TR:
+                        if (t.getDay().equals("T") || t.getDay().equals("R")) {
+                            fClasses.add(c);
+                        }
+                        break;
+                }
+            }
+        }
+
+        return fClasses;
     }
 }
 
@@ -62,7 +81,7 @@ class DateFilter extends Filter {
 // Day options for classes
 enum Day {
     MWF,
-    TR;
+    TR
 }
 
 
