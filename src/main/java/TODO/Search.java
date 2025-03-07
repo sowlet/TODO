@@ -9,6 +9,7 @@ public class Search {
     private ArrayList<Class> filterResults;
 
 
+
     // Class constructor
     public Search(){
         searchResults = new ArrayList<>();
@@ -16,6 +17,8 @@ public class Search {
         filters= new ArrayList<>();
         filterResults = new ArrayList<>();
     }
+
+
 
     /*
     searches through classes and returns an ArrayList of results based on query and stored filters
@@ -43,11 +46,13 @@ public class Search {
     }
 
 
+
     /* redundant method -> search can be used to modify the query
     public ArrayList<Class> modifyQuery(String query, ArrayList<Class> classes) {
         //TODO: Implement modifyQuery
         return null;
     }*/
+
 
 
     /*

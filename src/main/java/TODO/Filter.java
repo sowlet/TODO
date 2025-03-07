@@ -9,6 +9,7 @@ abstract class Filter {
 }
 
 
+
 // filters by department i.e. subject
 class DepartmentFilter extends Filter {
     private String dept;
@@ -39,6 +40,7 @@ class DepartmentFilter extends Filter {
 }
 
 
+
 // filters by Date
 class DateFilter extends Filter {
     private Day days;
@@ -54,11 +56,14 @@ class DateFilter extends Filter {
     }
 }
 
+
+
 // Day options for classes
 enum Day {
     MWF,
     TR;
 }
+
 
 
 // filters by time
