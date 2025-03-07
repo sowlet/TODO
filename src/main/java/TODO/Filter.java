@@ -15,7 +15,8 @@ class DepartmentFilter extends Filter {
     private String dept;
 
     // constructor
-    public void DepartmentFilter(String dept) {
+    public DepartmentFilter(String dept) {
+        super();
         this.dept = dept.toUpperCase(); // all subjects are upper case
     }
 
@@ -45,8 +46,8 @@ class DepartmentFilter extends Filter {
 class DateFilter extends Filter {
     private Day days;
 
-    public void DateFilter(Day days) {
-        //TODO: Implement filter by date
+    public DateFilter(Day days) {
+        //TODO: Implement filter by department
     }
 
     @Override
@@ -71,8 +72,8 @@ class TimeFilter extends Filter {
     private String start;
     private String end;
 
-    public void TimeFilter(String startTime, String endTime) {
-        //TODO: Implement filter by time
+    public TimeFilter(String startTime, String endTime) {
+        //TODO: Implement filter by department
     }
 
     @Override
