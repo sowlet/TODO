@@ -56,16 +56,20 @@ class DateFilter extends Filter {
         ArrayList<Class> fClasses = new ArrayList<>();
 
         for (Class c: classes) {
+            boolean added = false;
             for (ClassTime t: c.getTimes()) {
+                if (added) {break;}
                 switch(days) {
                     case MWF:
                         if (t.getDay().equals("M") || t.getDay().equals("W") || t.getDay().equals("F")) {
                             fClasses.add(c);
+                            added = true;
                         }
                         break;
                     case TR:
                         if (t.getDay().equals("T") || t.getDay().equals("R")) {
                             fClasses.add(c);
+                            added = true;
                         }
                         break;
                 }
