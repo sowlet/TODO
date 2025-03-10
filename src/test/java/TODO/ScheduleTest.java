@@ -10,7 +10,7 @@ class ScheduleTest {
     @Test
     void getName() {
         Schedule s = new Schedule("Test");
-        //Test to fail.
+        //Test to fail. Does fail when I run gradle build.
         assertEquals("SomethingElse", s.getName());
         //Test to pass
         assertEquals("Test", s.getName());
