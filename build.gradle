@@ -12,6 +12,12 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    //Attempted using these because I was getting errors about the loading of test framework implementation dependencies
+    //being deprecated and this was suggested on the website the error directed me to. When I built it with the below,
+    //the green arrow to run it dissapeared from next to the test and it did not run successfully from the run button up
+    //top- SB
+//    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+//    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 test {

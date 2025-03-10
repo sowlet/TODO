@@ -29,7 +29,7 @@ class DateFilter extends Filter {
     private Day days;
 
     public void DateFilter(Day days) {
-        //TODO: Implement filter by department
+        //TODO: Implement filter by date
     }
 
     @Override
@@ -49,7 +49,7 @@ class TimeFilter extends Filter {
     private String end;
 
     public void TimeFilter(String startTime, String endTime) {
-        //TODO: Implement filter by department
+        //TODO: Implement filter by time
     }
 
     @Override
