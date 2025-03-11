@@ -1,5 +1,8 @@
 package TODO;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 // default Filter
@@ -96,13 +99,53 @@ class TimeFilter extends Filter {
     private String end;
 
     public TimeFilter(String startTime, String endTime) {
-        //TODO: Implement filter by department
+        super();
+        start = startTime;
+        end = endTime;
     }
 
+    /*
+    returns sublist of classes that fit into stored time slot
+
+    @param classes the list of classes to be filtered
+    @return the list of filtered classes
+    @throws DateTimeParseException if the any of the Class objects have incompatible format to HH:mm:ss
+     */
     @Override
     public ArrayList<Class> filt(ArrayList<Class> classes) {
-        //TODO
-        return null;
+        ArrayList<Class> fClasses = new ArrayList<>();
+
+        // below code is ai generated and modified
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        try {
+            LocalTime s = LocalTime.parse(start, formatter);
+            LocalTime e = LocalTime.parse(end, formatter);
+            for (Class c: classes) {
+                boolean add = true;
+                for(ClassTime ct: c.getTimes()) {
+                    String cte = ct.getEndTime();
+                    String cts = ct.getStartTime();
+
+                    try {
+                        LocalTime procClassTimeEnd = LocalTime.parse(cte, formatter);
+                        LocalTime procClassTimeStart = LocalTime.parse(cts, formatter);
+
+                        if (procClassTimeStart.isBefore(s) || procClassTimeEnd.isAfter(e)) {
+                            add = false;
+                        }
+                    } catch (DateTimeParseException ce) {
+                        System.err.println("Error parsing time string: " + ce.getMessage());
+                    }
+                }
+                if (add) {
+                    fClasses.add(c);
+                }
+            }
+        } catch (DateTimeParseException e) {
+            System.err.println("Error parsing time string: " + e.getMessage());
+        }
+
+        return fClasses;
     }
 }
 
