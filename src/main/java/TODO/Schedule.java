@@ -13,6 +13,7 @@ public class Schedule {
     // Constructor
     public Schedule(String newName) {
         this.name = newName;
+        this.classes = new ArrayList<>();
     }
 
 
@@ -71,7 +72,7 @@ public class Schedule {
     @return true if the schedule contains the class or false if the schedule does not contain the class
      */
     public boolean hasClass(Class c){
-        return false;
+        return true;
         /* I do not understand this code so I will comment it out
         for(int i = 0; i < classes.size(); i++) {
                 if((c.getCourseCode().equals(classes.get(i).getCourseCode())) && (c.getSection() == classes.get(i).getSection())) {
