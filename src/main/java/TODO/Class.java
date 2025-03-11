@@ -116,7 +116,12 @@ public class Class
 
     }
 
-    //method to check if the class has a time conflict with another class
+    /*
+    method to check if the class has a time conflict with another class
+
+    @param otherClass class to compare to
+    @return true if there is a time conflict false if there is no conflict
+     */
     public boolean hasTimeConflict(Class otherClass){
         boolean conflict = false;
 
