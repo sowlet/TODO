@@ -127,7 +127,7 @@ public class Class
     @return true if there is a time conflict false if there is no conflict
     @throws DateTimeParseException if any time does not match format HH:mm:ss
      */
-    public boolean hasTimeConflict(Class otherClass){
+    public boolean hasTimeConflict(Class otherClass)throws DateTimeParseException{
         boolean conflict = false;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -152,11 +152,13 @@ public class Class
                             }
                         } catch (DateTimeParseException ce) {
                             System.err.println("Error parsing time string: " + ce.getMessage());
+                            throw ce;
                         }
                     }
                 }
             } catch(DateTimeParseException e){
                 System.err.println("Error parsing time string: " + e.getMessage());
+                throw e;
             }
         }
 
