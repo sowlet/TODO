@@ -123,6 +123,10 @@ class TimeFilterTest {
     }
 
     @Test
+    void moreTests() {
+    }
+
+    @Test
     void badFormatException() {
         ArrayList<Class> sampleClasses = new ArrayList<>();
 
