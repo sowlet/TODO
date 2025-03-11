@@ -99,7 +99,12 @@ public class Class
     }
 
 
-    //method to recalulate the class rating based on input
+    /*
+    method to recalulate the class rating based on input
+
+    @param newRating the rating to be added that must be between 0 and 5
+    @return 0 upon success or -1 upon failure
+     */
     public int giveRating(double newRating){
 
         if (newRating >= 0 && newRating <= 5){
