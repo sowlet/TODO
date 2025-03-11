@@ -48,20 +48,20 @@ public class Schedule {
     }
 
     public boolean hasClass(Class c){
-        for(int i = 0; i < classes.size(); i++) {
-                if((c.getCourseCode().equals(classes.get(i).getCourseCode())) && (c.getSection() == classes.get(i).getSection())) {
-                    return true;
-                }
-        }
+//        for(int i = 0; i < classes.size(); i++) {
+//                if((c.getCourseCode().equals(classes.get(i).getCourseCode())) && (c.getSection() == classes.get(i).getSection())) {
+//                    return true;
+//                }
+//        }
         return false;
     }
 
     public boolean hasTimeConflict(Class c) {
-        for(int i = 0; i < classes.size(); i++) {
-            if((c.getDays().equals(classes.get(i).getDays())) && (c.getTime().equals(classes.get(i).getTime()))) {
-                return true;
-            }
-        }
+//        for(int i = 0; i < classes.size(); i++) {
+//            if((c.getDays().equals(classes.get(i).getDays())) && (c.getTime().equals(classes.get(i).getTime()))) {
+//                return true;
+//            }
+//        }
         return false;
     }
 }
