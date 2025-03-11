@@ -137,6 +137,14 @@ class ClassTest {
 
 
     @Test
-    void hasTimeConflict() {
+    void endsInOtherConflict() {
+    }
+
+    @Test
+    void startInOtherConflict() {
+    }
+
+    @Test
+    void noConflict() {
     }
 }
