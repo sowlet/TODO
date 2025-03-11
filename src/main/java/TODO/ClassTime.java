@@ -1,6 +1,5 @@
 package TODO;
 
-import java.sql.Time;
 
 public class ClassTime {
     private String day;
@@ -13,6 +12,7 @@ public class ClassTime {
         this.start_time = start_time;
     }
 
+    // getters
     public String getDay(){
         return day;
     }
