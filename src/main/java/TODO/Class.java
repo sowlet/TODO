@@ -15,7 +15,7 @@ public class Class
     private String semester;
     private String subject;
     private ClassTime[] times;
-    private int totalSeats;
+    private int total_seats;
 
     //Variables (not from data file)
     private double rating;
@@ -35,7 +35,7 @@ public class Class
         this.semester = semester;
         this.subject = subject;
         this.times = times;
-        this.totalSeats = totalSeats;
+        this.total_seats = totalSeats;
 
         this.rating = 0;
         this.numRatings = 0;
@@ -91,7 +91,7 @@ public class Class
     }
 
     public int getTotalSeats() {
-        return totalSeats;
+        return total_seats;
     }
 
     public double getRating(){
