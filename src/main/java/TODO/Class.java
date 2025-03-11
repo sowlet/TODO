@@ -1,5 +1,9 @@
 package TODO;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 public class Class
 {
     // Variables (same name and order as in the data file)
@@ -121,17 +125,38 @@ public class Class
 
     @param otherClass class to compare to
     @return true if there is a time conflict false if there is no conflict
+    @throws DateTimeParseException if any time does not match format HH:mm:ss
      */
     public boolean hasTimeConflict(Class otherClass){
         boolean conflict = false;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-        for (ClassTime time : this.times){
-            for (ClassTime otherTime : otherClass.times){
-                if (time.getDay().equals(otherTime.getDay())){
-                    if ((time.getStartTime().compareTo(otherTime.getEndTime()) < 0 && time.getEndTime().compareTo(otherTime.getStartTime()) > 0) || (otherTime.getStartTime().compareTo(time.getEndTime()) < 0 && otherTime.getEndTime().compareTo(time.getStartTime()) > 0)){
-                        conflict = true;
+        // below code is modified ai generated code
+        for (ClassTime time : this.times) {
+            try {
+                LocalTime timeStart = LocalTime.parse(time.getStartTime(), formatter);
+                LocalTime timeEnd = LocalTime.parse(time.getEndTime(), formatter);
+                for (ClassTime otherTime : otherClass.times) {
+                    if (time.getDay().equals(otherTime.getDay())) {
+                        String otet = otherTime.getEndTime();
+                        String otst = otherTime.getStartTime();
+
+                        try {
+                            LocalTime otherTimeEndTime = LocalTime.parse(otet, formatter);
+                            LocalTime otherTimeStartTime = LocalTime.parse(otst, formatter);
+
+                            if (otherTimeStartTime.compareTo(timeStart) > -1 && otherTimeStartTime.compareTo(timeEnd) < 1) { // start time conflicts
+                                conflict = true;
+                            } else if (otherTimeEndTime.compareTo(timeStart) > -1 && otherTimeEndTime.compareTo(timeEnd) < 1) { // end time conflicts
+                                conflict = true;
+                            }
+                        } catch (DateTimeParseException ce) {
+                            System.err.println("Error parsing time string: " + ce.getMessage());
+                        }
                     }
                 }
+            } catch(DateTimeParseException e){
+                System.err.println("Error parsing time string: " + e.getMessage());
             }
         }
 
