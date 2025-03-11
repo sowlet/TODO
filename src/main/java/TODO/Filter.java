@@ -134,7 +134,6 @@ class TimeFilter extends Filter {
                             add = false;
                         }
                     } catch (DateTimeParseException ce) {
-                        System.err.println("Error parsing time string: " + ce.getMessage());
                         throw ce;
                     }
                 }

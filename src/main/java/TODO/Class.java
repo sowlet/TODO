@@ -151,7 +151,6 @@ public class Class
                                 conflict = true;
                             }
                         } catch (DateTimeParseException ce) {
-                            System.err.println("Error parsing time string: " + ce.getMessage());
                             throw ce;
                         }
                     }
