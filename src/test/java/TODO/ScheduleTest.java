@@ -29,7 +29,7 @@ class ScheduleTest {
     }
 
     @Test
-    void addClass() {
+    void basicAddClass() {
         Schedule s = new Schedule("Test");
         String json1 = "{\n" +
                 "            \"credits\": 3,\n" +
@@ -68,7 +68,7 @@ class ScheduleTest {
     }
 
     @Test
-    void removeClass() {
+    void basicRemoveClass() {
         Schedule s = new Schedule("Test");
         String json1 = "{\n" +
                 "            \"credits\": 3,\n" +
@@ -101,9 +101,9 @@ class ScheduleTest {
 
         Class c = new Gson().fromJson(json1,Class.class);
         s.addClass(c);
+        s.removeClass(c);
         ArrayList<Class> classes = s.getClasses();
-        assertEquals(1,classes.size());
-        assertEquals(c,classes.get(0));
+        assertEquals(0,classes.size());
     }
 
     @Test
