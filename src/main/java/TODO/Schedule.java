@@ -67,12 +67,19 @@ public class Schedule {
 
     /*
     returns whether the schedule has a Class object or not
+    NOTE: all classes used in this project (for the MVP) are objects and all schedules use shallow copies of them
+          thus, we are using the equality operator
 
     @param c Class object to check
     @return true if the schedule contains the class or false if the schedule does not contain the class
      */
     public boolean hasClass(Class c){
-        return true;
+        for (Class scheduleClass: classes) {
+            if (c == scheduleClass) {
+                return true;
+            }
+        }
+        return false;
         /* I do not understand this code so I will comment it out
         for(int i = 0; i < classes.size(); i++) {
                 if((c.getCourseCode().equals(classes.get(i).getCourseCode())) && (c.getSection() == classes.get(i).getSection())) {
