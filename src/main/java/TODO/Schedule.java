@@ -96,6 +96,11 @@ public class Schedule {
     @return true if there is a conflict between the given class and the rest within the schedule or false otherwise
      */
     public boolean hasTimeConflict(Class c) {
+        for (Class scheduleClass: classes) {
+            if (scheduleClass.hasTimeConflict(c)) {
+                return true;
+            }
+        }
         return false;
         /* I do not understand this code so I will comment it out
         for(int i = 0; i < classes.size(); i++) {
