@@ -183,5 +183,155 @@ class ScheduleTest {
 
     @Test
     void hasTimeConflict() {
+        ArrayList<Class> sampleClasses = new ArrayList<>();
+        Schedule test = new Schedule("Test");
+
+        // small portion of JSON data
+        // TR
+        String json1 = "{\n" +
+                "            \"credits\": 3,\n" +
+                "            \"faculty\": [\n" +
+                "                \"McFeaters, Michelle R.\"\n" +
+                "            ],\n" +
+                "            \"is_lab\": false,\n" +
+                "            \"is_open\": true,\n" +
+                "            \"location\": \"SHAL 314\",\n" +
+                "            \"name\": \"COST ACCOUNTING\",\n" +
+                "            \"number\": 303,\n" +
+                "            \"open_seats\": 2,\n" +
+                "            \"section\": \"A\",\n" +
+                "            \"semester\": \"2023_Fall\",\n" +
+                "            \"subject\": \"ACCT\",\n" +
+                "            \"times\": [\n" +
+                "                {\n" +
+                "                    \"day\": \"T\",\n" +
+                "                    \"end_time\": \"18:15:00\",\n" +
+                "                    \"start_time\": \"17:00:00\"\n" +
+                "                },\n" +
+                "                {\n" +
+                "                    \"day\": \"R\",\n" +
+                "                    \"end_time\": \"18:15:00\",\n" +
+                "                    \"start_time\": \"17:00:00\"\n" +
+                "                }\n" +
+                "            ],\n" +
+                "            \"total_seats\": 30\n" +
+                "        }";
+
+        // TR
+        String json3 = "{\n" +
+                "            \"credits\": 3,\n" +
+                "            \"faculty\": [\n" +
+                "                \"Shultz, Tricia Michele\"\n" +
+                "            ],\n" +
+                "            \"is_lab\": false,\n" +
+                "            \"is_open\": true,\n" +
+                "            \"location\": \"SHAL 308\",\n" +
+                "            \"name\": \"ADVANCED ACCOUNTING II\",\n" +
+                "            \"number\": 402,\n" +
+                "            \"open_seats\": 10,\n" +
+                "            \"section\": \"A\",\n" +
+                "            \"semester\": \"2023_Fall\",\n" +
+                "            \"subject\": \"ACCT\",\n" +
+                "            \"times\": [\n" +
+                "                {\n" +
+                "                    \"day\": \"T\",\n" +
+                "                    \"end_time\": \"18:45:00\",\n" +
+                "                    \"start_time\": \"17:30:00\"\n" +
+                "                },\n" +
+                "                {\n" +
+                "                    \"day\": \"R\",\n" +
+                "                    \"end_time\": \"18:45:00\",\n" +
+                "                    \"start_time\": \"17:30:00\"\n" +
+                "                }\n" +
+                "            ],\n" +
+                "            \"total_seats\": 25\n" +
+                "        }";
+        String[] js = {json1,json3};
+        for (String j: js) {
+            sampleClasses.add(new Gson().fromJson(j,Class.class));
+        }
+
+        for (Class temp: sampleClasses) {
+            test.addClass(temp);
+        }
+
+        assertEquals(1, test.getClasses().size());
+    }
+
+    @Test
+    void notHasTimeConflict() {
+        ArrayList<Class> sampleClasses = new ArrayList<>();
+        Schedule test = new Schedule("Test");
+
+        // small portion of JSON data
+        // TR
+        String json1 = "{\n" +
+                "            \"credits\": 3,\n" +
+                "            \"faculty\": [\n" +
+                "                \"McFeaters, Michelle R.\"\n" +
+                "            ],\n" +
+                "            \"is_lab\": false,\n" +
+                "            \"is_open\": true,\n" +
+                "            \"location\": \"SHAL 314\",\n" +
+                "            \"name\": \"COST ACCOUNTING\",\n" +
+                "            \"number\": 303,\n" +
+                "            \"open_seats\": 2,\n" +
+                "            \"section\": \"A\",\n" +
+                "            \"semester\": \"2023_Fall\",\n" +
+                "            \"subject\": \"ACCT\",\n" +
+                "            \"times\": [\n" +
+                "                {\n" +
+                "                    \"day\": \"T\",\n" +
+                "                    \"end_time\": \"21:15:00\",\n" +
+                "                    \"start_time\": \"19:00:00\"\n" +
+                "                },\n" +
+                "                {\n" +
+                "                    \"day\": \"R\",\n" +
+                "                    \"end_time\": \"21:15:00\",\n" +
+                "                    \"start_time\": \"19:00:00\"\n" +
+                "                }\n" +
+                "            ],\n" +
+                "            \"total_seats\": 30\n" +
+                "        }";
+
+        // TR
+        String json3 = "{\n" +
+                "            \"credits\": 3,\n" +
+                "            \"faculty\": [\n" +
+                "                \"Shultz, Tricia Michele\"\n" +
+                "            ],\n" +
+                "            \"is_lab\": false,\n" +
+                "            \"is_open\": true,\n" +
+                "            \"location\": \"SHAL 308\",\n" +
+                "            \"name\": \"ADVANCED ACCOUNTING II\",\n" +
+                "            \"number\": 402,\n" +
+                "            \"open_seats\": 10,\n" +
+                "            \"section\": \"A\",\n" +
+                "            \"semester\": \"2023_Fall\",\n" +
+                "            \"subject\": \"ACCT\",\n" +
+                "            \"times\": [\n" +
+                "                {\n" +
+                "                    \"day\": \"T\",\n" +
+                "                    \"end_time\": \"18:45:00\",\n" +
+                "                    \"start_time\": \"17:30:00\"\n" +
+                "                },\n" +
+                "                {\n" +
+                "                    \"day\": \"R\",\n" +
+                "                    \"end_time\": \"18:45:00\",\n" +
+                "                    \"start_time\": \"17:30:00\"\n" +
+                "                }\n" +
+                "            ],\n" +
+                "            \"total_seats\": 25\n" +
+                "        }";
+        String[] js = {json1,json3};
+        for (String j: js) {
+            sampleClasses.add(new Gson().fromJson(j,Class.class));
+        }
+
+        for (Class temp: sampleClasses) {
+            test.addClass(temp);
+        }
+
+        assertEquals(2, test.getClasses().size());
     }
 }
