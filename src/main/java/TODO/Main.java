@@ -63,20 +63,46 @@ public class Main {
             System.out.println("Majors: " + account.getMajors());
             System.out.println("Minors: " + account.getMinors());
             System.out.println("Classes Taken: " + account.getClassesTaken());
-            System.out.println("To add a major: type 'add major'\nTo add a minor: type 'add minor'\nTo go back: type 'back'");
+            System.out.println("To add a major: type 'add major'\nTo remove a major: type 'remove major'\nTo add a minor: type 'add minor'\nTo remove a minor: type 'remove minor'\nTo go back: type 'back'");
 
             String input = scan.nextLine();
 
             if (input.equals("add major")) {
                 System.out.println("Enter major to add: ");
                 String major = scan.nextLine();
-                account.addMajor(major);
-                System.out.println("Major added successfully");
+                if (!account.getMajors().contains(major)) {
+                    account.addMajor(major);
+                    System.out.println("Major added successfully");
+                } else {
+                    System.out.println("Major already exists");
+                }
+            } else if (input.equals("remove major")) {
+                System.out.println("Enter major to remove: ");
+                String major = scan.nextLine();
+                if (account.getMajors().contains(major)) {
+                    account.removeMajor(major);
+                    System.out.println("Major removed successfully");
+                } else {
+                    System.out.println("Major does not exist");
+                }
             } else if (input.equals("add minor")) {
                 System.out.println("Enter minor to add: ");
                 String minor = scan.nextLine();
-                account.addMinor(minor);
-                System.out.println("Minor added successfully");
+                if (!account.getMinors().contains(minor)) {
+                    account.addMinor(minor);
+                    System.out.println("Minor added successfully");
+                } else {
+                    System.out.println("Minor already exists");
+                }
+            } else if (input.equals("remove minor")) {
+                System.out.println("Enter minor to remove: ");
+                String minor = scan.nextLine();
+                if (account.getMinors().contains(minor)) {
+                    account.removeMinor(minor);
+                    System.out.println("Minor removed successfully");
+                } else {
+                    System.out.println("Minor does not exist");
+                }
             } else if (input.equals("back")) {
                 break;
             } else {
