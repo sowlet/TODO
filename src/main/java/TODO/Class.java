@@ -102,6 +102,19 @@ public class Class
         return rating;
     }
 
+    @Override
+    public String toString(){
+        String classTimes = "";
+        for (ClassTime cT : times) {
+            classTimes += cT.getDay() + " " + cT.getStartTime() + " - " + cT.getEndTime() + "\n";
+        }
+        return subject + number + " " + section + "\n" + name + "\n" + classTimes + " " + semester + "\nlocation: " + location + "\ncredits:  " + credits + "\nseats: " + open_seats + "/" + total_seats + " seats\nislab: " + is_lab;
+    }
+
+    public String getClassNames(){
+        return subject + number + " " + section + " : " + name;
+    }
+
 
     /*
     method to recalulate the class rating based on input

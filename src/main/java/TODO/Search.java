@@ -28,7 +28,7 @@ public class Search {
     @return an ArrayList of matching classes that pass the stored filters
      */
     public ArrayList<Class> search(String query, ArrayList<Class> classes) {
-        this.query = query;
+        this.query = query.toUpperCase();
 
         for (Class c: classes) {
             if (c.getName().contains(query)) {
