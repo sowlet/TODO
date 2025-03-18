@@ -245,12 +245,17 @@ public class Main {
 
                 for (Class c : classes) {
                     if (c.getName().equals(className) && c.getSection() == section && c.getSemester().equals(semester)) {
-                        currentlyEditing.addClass(c);
-                        System.out.println("Class successfully added to schedule!");
-                        return;
+                        if (!currentlyEditing.hasTimeConflict(c)) {
+                            System.out.println("Class has a time conflict with current schedule");
+                        } else {
+                            currentlyEditing.addClass(c);
+                            System.out.println("Class successfully added to schedule!");
+                            return;
+                        }
+                    } else{
+                        System.out.println("Class does not exist");
                     }
                 }
-                System.out.println("Class does not exist or cannot be added to schedule.");
             } else if (input.equals("back")) {
                 break;
             } else {
