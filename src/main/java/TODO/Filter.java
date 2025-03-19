@@ -126,23 +126,18 @@ class TimeFilter extends Filter {
                     String cte = ct.getEndTime();
                     String cts = ct.getStartTime();
 
-                    try {
                         LocalTime procClassTimeEnd = LocalTime.parse(cte, formatter);
                         LocalTime procClassTimeStart = LocalTime.parse(cts, formatter);
 
                         if (procClassTimeStart.isBefore(s) || procClassTimeEnd.isAfter(e)) {
                             add = false;
                         }
-                    } catch (DateTimeParseException ce) {
-                        throw ce;
-                    }
                 }
                 if (add) {
                     fClasses.add(c);
                 }
             }
         } catch (DateTimeParseException e) {
-            System.err.println("Error parsing time string: " + e.getMessage());
             throw e;
         }
 
