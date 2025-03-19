@@ -193,7 +193,7 @@ public class Main {
         for (Class c : schedule.getClasses()) {
             for (ClassTime t : c.getTimes()) {
                 String className = c.getName() + " " + c.getSection();
-                String time = t.getStartTime() + " - " + t.getEndTime();
+                String time = c.getSubject() + " " + c.getNumber() + " " + c.getSection() + " " + t.getStartTime() + " - " + t.getEndTime();
                 String day = t.getDay();
 
                 if (!classData.containsKey(className)) {
@@ -203,11 +203,19 @@ public class Main {
             }
         }
 
+        // sort the class times
+        for (List<String> times : classData.values()) {
+            times.sort((time1, time2) -> {
+                String startTime1 = time1.split(": ")[1].split(" - ")[0];
+                String startTime2 = time2.split(": ")[1].split(" - ")[0];
+                return startTime1.compareTo(startTime2);
+            });
+        }
 
         // display the schedule in a weekly calendar format
         System.out.println("Weekly Schedule:");
         System.out.println("-------------------------------------------------");
-        System.out.printf("%-40s|%-20s|%-20s|%-20s|%-20s|%-20s%n", "Class Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
+        System.out.printf("%-40s|%-31s|%-31s|%-31s|%-31s|%-31s%n", "Class Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
         System.out.println("-------------------------------------------------");
         // display classes per day
         for (String className : classData.keySet()) {
@@ -236,7 +244,7 @@ public class Main {
                         break;
                 }
             }
-            System.out.printf("%-40s|%-20s|%-20s|%-20s|%-20s|%-20s%n", className, days[0], days[1], days[2], days[3], days[4]);
+            System.out.printf("%-40s|%-31s|%-31s|%-31s|%-31s|%-31s%n", className, days[0], days[1], days[2], days[3], days[4]);
         }
     }
 
