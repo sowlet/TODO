@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Account {
     // Variables
     private ArrayList<Class> classesTaken;
-    private ArrayList<Schedule> schedules;
+    public ArrayList<Schedule> schedules;
     private String username;
     private String password;
     private String email;
@@ -34,6 +34,21 @@ public class Account {
     public String getUsername(){
         return this.username;
     }
+    public String getPassword(){return this.password;}
+    public String getEmail(){return this.email;}
+    public String getMajors(){
+        return this.majors.toString();
+    }
+    public String getMinors(){
+        return this.minors.toString();
+    }
+    public String getClassesTaken() {
+        String classes = "";
+        for (Class c : classesTaken) {
+            classes += c.getName() + " ";
+        }
+        return classes;
+    }
     public void setUsername(String username){
         this.username = username;
     }
@@ -49,8 +64,8 @@ public class Account {
     public void addSchedule(String name){
         this.schedules.add(new Schedule(name));
     }
-    public void removeSchedule(String name){
-        this.schedules.remove(name);
+    public void removeSchedule(Schedule schedule){
+        this.schedules.remove(schedule);
     }
 
     public void addMajor(String major){

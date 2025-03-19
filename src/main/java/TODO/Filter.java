@@ -109,10 +109,10 @@ class TimeFilter extends Filter {
 
     @param classes the list of classes to be filtered
     @return the list of filtered classes
-    @throws DateTimeParseException if the any of the Class objects have incompatible format to HH:mm:ss
+    @throws DateTimeParseException if any of the Class objects have incompatible format to HH:mm:ss
      */
     @Override
-    public ArrayList<Class> filt(ArrayList<Class> classes) {
+    public ArrayList<Class> filt(ArrayList<Class> classes) throws DateTimeParseException {
         ArrayList<Class> fClasses = new ArrayList<>();
 
         // below code is ai generated and modified
@@ -134,7 +134,7 @@ class TimeFilter extends Filter {
                             add = false;
                         }
                     } catch (DateTimeParseException ce) {
-                        System.err.println("Error parsing time string: " + ce.getMessage());
+                        throw ce;
                     }
                 }
                 if (add) {
@@ -143,6 +143,7 @@ class TimeFilter extends Filter {
             }
         } catch (DateTimeParseException e) {
             System.err.println("Error parsing time string: " + e.getMessage());
+            throw e;
         }
 
         return fClasses;
