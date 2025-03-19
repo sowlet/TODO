@@ -2,6 +2,7 @@ package TODO;
 
 import java.io.*;
 import java.sql.Time;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -338,45 +339,49 @@ public class Main {
     }
 
     private static void searchClasses(Scanner scan) {
-        System.out.println("Enter search query: ");
-        String query = scan.nextLine().toUpperCase();
+        try {
+            System.out.println("Enter search query: ");
+            String query = scan.nextLine().toUpperCase();
 
-        System.out.println("Would you like to filter by time? (y/n)");
-        if (scan.nextLine().charAt(0) == 'y') {
-            System.out.println("Enter start time (HH:mm:ss): ");
-            String startTime = scan.nextLine();
-            System.out.println("Enter end time (HH:mm:ss): ");
-            String endTime = scan.nextLine();
-            search.modifyFilter(new TimeFilter(startTime, endTime));
-        }
-
-        System.out.println("Would you like to filter by days/date? (y/n)");
-        if (scan.nextLine().charAt(0) == 'y') {
-            System.out.println("Type 'MWF' for MWF classes or 'TR' for TR classes");
-            String days = scan.nextLine().toUpperCase();
-            if (days.equals("MWF")) {
-                search.modifyFilter(new DateFilter(Day.MWF));
-            } else if (days.equals("TR")) {
-                search.modifyFilter(new DateFilter(Day.TR));
-            } else {
-                System.out.println("Not a valid date");
+            System.out.println("Would you like to filter by time? (y/n)");
+            if (scan.nextLine().charAt(0) == 'y') {
+                System.out.println("Enter start time (HH:mm:ss): ");
+                String startTime = scan.nextLine();
+                System.out.println("Enter end time (HH:mm:ss): ");
+                String endTime = scan.nextLine();
+                search.modifyFilter(new TimeFilter(startTime, endTime));
             }
-        }
 
-        System.out.println("Would you like to filter by subject? (y/n)");
-        if (scan.nextLine().charAt(0) == 'y') {
-            System.out.println("Enter subject name: ");
-            String subject = scan.nextLine().toUpperCase();
-            if (getSubjects().contains(subject)) {
-                search.modifyFilter(new DepartmentFilter(subject));
-            } else {
-                System.out.println("Not a valid subject");
+            System.out.println("Would you like to filter by days/date? (y/n)");
+            if (scan.nextLine().charAt(0) == 'y') {
+                System.out.println("Type 'MWF' for MWF classes or 'TR' for TR classes");
+                String days = scan.nextLine().toUpperCase();
+                if (days.equals("MWF")) {
+                    search.modifyFilter(new DateFilter(Day.MWF));
+                } else if (days.equals("TR")) {
+                    search.modifyFilter(new DateFilter(Day.TR));
+                } else {
+                    System.out.println("Not a valid date");
+                }
             }
-        }
 
-        searchResults = search.search(query, classes);
-        for (Class c : searchResults) {
-            System.out.println(c + "\n");
+            System.out.println("Would you like to filter by subject? (y/n)");
+            if (scan.nextLine().charAt(0) == 'y') {
+                System.out.println("Enter subject name: ");
+                String subject = scan.nextLine().toUpperCase();
+                if (getSubjects().contains(subject)) {
+                    search.modifyFilter(new DepartmentFilter(subject));
+                } else {
+                    System.out.println("Not a valid subject");
+                }
+            }
+
+            searchResults = search.search(query, classes);
+            for (Class c : searchResults) {
+                System.out.println(c + "\n");
+            }
+        } catch (Exception e){
+            System.err.println(e.getMessage());
         }
     }
 
