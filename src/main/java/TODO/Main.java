@@ -207,7 +207,7 @@ public class Main {
         // display the schedule in a weekly calendar format
         System.out.println("Weekly Schedule:");
         System.out.println("-------------------------------------------------");
-        System.out.printf("%-30s|%-20s|%-20s|%-20s|%-20s|%-20s%n", "Class Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
+        System.out.printf("%-40s|%-20s|%-20s|%-20s|%-20s|%-20s%n", "Class Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
         System.out.println("-------------------------------------------------");
         // display classes per day
         for (String className : classData.keySet()) {
@@ -236,7 +236,7 @@ public class Main {
                         break;
                 }
             }
-            System.out.printf("%-30s|%-20s|%-20s|%-20s|%-20s|%-20s%n", className, days[0], days[1], days[2], days[3], days[4]);
+            System.out.printf("%-40s|%-20s|%-20s|%-20s|%-20s|%-20s%n", className, days[0], days[1], days[2], days[3], days[4]);
         }
     }
 
