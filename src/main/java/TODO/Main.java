@@ -1,6 +1,7 @@
 package TODO;
 
 import java.io.*;
+import java.sql.Time;
 import java.util.*;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -169,12 +170,73 @@ public class Main {
         }
 
         String scheduleName = scan.nextLine();
+        boolean scheduleFound = false;
         for (Schedule schedule : currentAccount.schedules) {
             if (schedule.getName().equals(scheduleName)) {
-                for (Class c : schedule.getClasses()) {
-                    System.out.println(c);
+                viewScheduleInCalendarFormat(schedule);
+                scheduleFound = true;
+                break;
+            }
+        }
+        if (!scheduleFound) {
+            System.out.println("Schedule not found.");
+        }
+    }
+
+    public static void viewScheduleInCalendarFormat(Schedule schedule) {
+        System.out.println("Schedule: " + schedule.getName());
+
+        // create map to store data for each class
+        Map<String, List<String>> classData = new HashMap<>();
+
+        // get the times, names, and days of the classes and add it to the respective class in the map
+        for (Class c : schedule.getClasses()) {
+            for (ClassTime t : c.getTimes()) {
+                String className = c.getName() + " " + c.getSection();
+                String time = t.getStartTime() + " - " + t.getEndTime();
+                String day = t.getDay();
+
+                if (!classData.containsKey(className)) {
+                    classData.put(className, new ArrayList<>());
+                }
+                classData.get(className).add(day + ": " + time);
+            }
+        }
+
+
+        // display the schedule in a weekly calendar format
+        System.out.println("Weekly Schedule:");
+        System.out.println("-------------------------------------------------");
+        System.out.printf("%-30s|%-20s|%-20s|%-20s|%-20s|%-20s%n", "Class Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
+        System.out.println("-------------------------------------------------");
+        // display classes per day
+        for (String className : classData.keySet()) {
+            List<String> times = classData.get(className);
+            String[] days = new String[5];
+            Arrays.fill(days, ""); // Initialize days array with empty strings
+            for (String time : times) {
+                String[] parts = time.split(": ");
+                String day = parts[0];
+                String timeRange = parts[1];
+                switch (day) {
+                    case "M":
+                        days[0] += timeRange + " "; // Append time range to the respective day
+                        break;
+                    case "T":
+                        days[1] += timeRange + " ";
+                        break;
+                    case "W":
+                        days[2] += timeRange + " ";
+                        break;
+                    case "R":
+                        days[3] += timeRange + " ";
+                        break;
+                    case "F":
+                        days[4] += timeRange + " ";
+                        break;
                 }
             }
+            System.out.printf("%-30s|%-20s|%-20s|%-20s|%-20s|%-20s%n", className, days[0], days[1], days[2], days[3], days[4]);
         }
     }
 
@@ -243,18 +305,21 @@ public class Main {
                 System.out.println("Enter class semester: ");
                 String semester = scan.nextLine();
 
+                boolean classAdded = false;
                 for (Class c : classes) {
                     if (c.getName().equals(className) && c.getSection() == section && c.getSemester().equals(semester)) {
-                        if (!currentlyEditing.hasTimeConflict(c)) {
+                        if (currentlyEditing.hasTimeConflict(c)) {
                             System.out.println("Class has a time conflict with current schedule");
                         } else {
                             currentlyEditing.addClass(c);
                             System.out.println("Class successfully added to schedule!");
+                            classAdded = true;
                             return;
                         }
-                    } else{
-                        System.out.println("Class does not exist");
                     }
+                }
+                if (!classAdded) {
+                    System.out.println("Class does not exist");
                 }
             } else if (input.equals("back")) {
                 break;
