@@ -115,12 +115,38 @@ public class Main {
     private static void createAccount(Scanner scan) {
         System.out.println("Create an account\nEnter username: ");
         String username = scan.nextLine();
-        System.out.println("Enter password: ");
-        String password = scan.nextLine();
-        System.out.println("Enter email: ");
-        String email = scan.nextLine();
-        accounts.add(new Account(username, password, email));
-        System.out.println("Account created successfully");
+        if(usernameExists(username)) {
+            System.out.println("This username already exists.");
+        } else {
+            System.out.println("Enter password: ");
+            String password = scan.nextLine();
+            System.out.println("Enter email: ");
+            String email = scan.nextLine();
+            if (emailExists(email)) {
+                System.out.println("This email already has an account");
+            } else {
+                accounts.add(new Account(username, password, email));
+                System.out.println("Account created successfully");
+            }
+        }
+    }
+
+    private static boolean usernameExists(String username) {
+        for(int i = 0; i < accounts.size(); i++) {
+            if(accounts.get(i).getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean emailExists(String email) {
+        for(int i = 0; i < accounts.size(); i++) {
+            if(accounts.get(i).getEmail().equals(email)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Account login(Scanner scan) {
