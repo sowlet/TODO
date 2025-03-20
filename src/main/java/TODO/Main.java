@@ -8,6 +8,8 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 
+import static java.lang.System.exit;
+
 public class Main {
     public static ArrayList<Class> classes = new ArrayList<>();
     public static ArrayList<Account> accounts = new ArrayList<>();
@@ -17,24 +19,28 @@ public class Main {
 
     public static void main(String[] args) throws FileNotFoundException {
         loadClassesFromJson("src/main/java/TODO/data_wolfe.json", classes);
+        loadAccountsFromJson("src/main/java/TODO/data_accounts.json", accounts);
         System.out.println(getSubjects());
         run();
     }
 
-    public static void run() {
+    public static void run() throws FileNotFoundException {
         Account currentAccount = null;
         Scanner scan = new Scanner(System.in);
         String input;
 
         while (true) {
             while (currentAccount == null) {
-                System.out.println("Welcome!\nTo create an account: type 'create'\nTo login: type 'login'");
+                System.out.println("Welcome!\nTo create an account: type 'create'\nTo login: type 'login'\nTo exit the application: type 'exit'");
                 input = scan.nextLine();
 
                 if (input.equals("create")) {
                     createAccount(scan);
                 } else if (input.equals("login")) {
                     currentAccount = login(scan);
+                }else if (input.equals("exit")) {
+                    currentAccount = null;
+                    exit(0);
                 } else {
                     System.out.println("Invalid input. Please try again.");
                 }
@@ -42,7 +48,7 @@ public class Main {
 
             while (currentAccount != null) {
                 System.out.println("Welcome " + currentAccount.getUsername() + "!");
-                System.out.println("Home:\nTo view your schedules: type 'schedules'\nTo view account info: type 'account'\nTo logout: type 'logout'");
+                System.out.println("Home:\nTo view your schedules: type 'schedules'\nTo view account info: type 'account'\nTo logout and save your changes: type 'logout'");
                 input = scan.nextLine();
 
                 if (input.equals("schedules")) {
@@ -51,6 +57,7 @@ public class Main {
                     // display account info
                     viewAccount(scan, currentAccount);
                 } else if (input.equals("logout")) {
+                    updateAccountsToJson("src/main/java/TODO/data_accounts.json", accounts);
                     currentAccount = null;
                 } else {
                     System.out.println("Invalid input. Please try again.");
@@ -113,7 +120,7 @@ public class Main {
         }
     }
 
-    private static void createAccount(Scanner scan) {
+    private static void createAccount(Scanner scan) throws FileNotFoundException {
         System.out.println("Create an account\nEnter username: ");
         String username = scan.nextLine();
         if(usernameExists(username)) {
@@ -127,6 +134,7 @@ public class Main {
                 System.out.println("This email already has an account");
             } else {
                 accounts.add(new Account(username, password, email));
+                updateAccountsToJson("src/main/java/TODO/data_accounts.json", accounts);
                 System.out.println("Account created successfully");
             }
         }
@@ -477,5 +485,36 @@ public class Main {
 
     static class JsonWrapper {
         ArrayList<Class> classes;
+    }
+
+    public static void loadAccountsFromJson(String filePath, ArrayList<Account> accountList) throws FileNotFoundException {
+        try (BufferedReader readerA = new BufferedReader(new FileReader(filePath))) {
+            Gson gsonA = new Gson();
+            Type accountListType = new TypeToken<JsonWrapperAccounts>() {}.getType();
+            JsonWrapperAccounts wrapper = gsonA.fromJson(readerA, accountListType);
+            accountList.addAll(wrapper.accounts);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static class JsonWrapperAccounts{
+        ArrayList<Account> accounts;
+    }
+
+    static class JsonWrapperAccountObject{
+        ArrayList<Account> accounts;
+    }
+
+    public static void updateAccountsToJson(String filePath, ArrayList<Account> accountList) throws FileNotFoundException {
+        // Write the updated list back to the JSON file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            Gson gsonB = new Gson();
+            JsonWrapperAccountObject wrapperB = new JsonWrapperAccountObject();
+            wrapperB.accounts = accountList;
+            gsonB.toJson(wrapperB, writer);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
