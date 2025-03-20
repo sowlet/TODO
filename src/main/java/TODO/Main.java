@@ -52,7 +52,7 @@ public class Main {
                     // display account info
                     viewAccount(scan, currentAccount);
                 } else if (input.equals("logout")) {
-                    updateAccountsToJson("src/main/java/TODO/data_accounts.json", currentAccount);
+                    updateAccountsToJson("src/main/java/TODO/data_accounts.json", accounts);
                     currentAccount = null;
                 } else {
                     System.out.println("Invalid input. Please try again.");
@@ -123,7 +123,7 @@ public class Main {
         System.out.println("Enter email: ");
         String email = scan.nextLine();
         accounts.add(new Account(username, password, email));
-        //add account to JSON****************************************************************************************
+        updateAccountsToJson("src/main/java/TODO/data_accounts.json", accounts);
         System.out.println("Account created successfully");
     }
 
@@ -136,7 +136,6 @@ public class Main {
         for (Account account : accounts) {
             if (account.getUsername().equals(username) && account.getPassword().equals(password)) {
                 System.out.println("Login successful");
-                //load account info in from JSON including schedules********************************************************
                 return account;
             }
         }
@@ -263,7 +262,6 @@ public class Main {
             }
         }
         currentAccount.addSchedule(scheduleName);
-        //add schedule to JSON*****************************************************************************************
     }
 
     private static void editSchedule(Scanner scan, Account currentAccount) {
@@ -341,7 +339,6 @@ public class Main {
                 System.out.println("Invalid input. Please try again.");
             }
         }
-        //add class to JSON****************************************************************************************
     }
 
     private static void searchClasses(Scanner scan) {
@@ -407,8 +404,6 @@ public class Main {
             }
         }
         System.out.println("Class does not exist or cannot be removed from schedule.");
-
-        //remove class from JSON****************************************************************************************
     }
 
     private static void deleteSchedule(Scanner scan, Account currentAccount) {
@@ -480,13 +475,12 @@ public class Main {
         ArrayList<Account> accounts;
     }
 
-    public static void updateAccountsToJson(String filePath, Account newAccount) throws FileNotFoundException {
+    public static void updateAccountsToJson(String filePath, ArrayList<Account> accountList) throws FileNotFoundException {
         // Write the updated list back to the JSON file
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             Gson gsonB = new Gson();
-            Type accountObjType = new TypeToken<JsonWrapperAccountObject>() {}.getType();
             JsonWrapperAccountObject wrapperB = new JsonWrapperAccountObject();
-            wrapperB.accounts = accounts;
+            wrapperB.accounts = accountList;
             gsonB.toJson(wrapperB, writer);
         }catch (IOException e) {
             e.printStackTrace();
