@@ -464,14 +464,14 @@ public class Main {
                 }
             }
 
-            System.out.println("Would you like to filter by subject? (y/n)");
+            System.out.println("Would you like to filter by course code? (y/n)");
             if (scan.nextLine().charAt(0) == 'y') {
-                System.out.println("Enter subject name: ");
+                System.out.println("Enter course code: ");
                 String subject = scan.nextLine().toUpperCase();
                 if (getSubjects().contains(subject)) {
                     search.modifyFilter(new DepartmentFilter(subject));
                 } else {
-                    System.out.println("Not a valid subject");
+                    System.out.println("Not a valid course code");
                 }
             }
 
