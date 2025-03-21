@@ -416,6 +416,10 @@ public class Main {
             for (Class c : searchResults) {
                 System.out.println(c + "\n");
             }
+            // removing features so that next search will be clean
+            search.removeFilter(new DepartmentFilter("Whatever!"));
+            search.removeFilter(new DateFilter(Day.TR));
+            search.removeFilter(new TimeFilter("00:00:00", "00:00:00"));
         } catch (Exception e){
             System.err.println(e.getMessage());
         }
