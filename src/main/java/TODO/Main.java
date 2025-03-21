@@ -422,6 +422,7 @@ public class Main {
             search.removeFilter(new TimeFilter("00:00:00", "00:00:00"));
         } catch (Exception e){
             System.out.println(e.getMessage());
+            search.removeFilter(new TimeFilter("00:00:00", "00:00:00"));
         }
     }
 
