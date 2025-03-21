@@ -349,10 +349,12 @@ public class Main {
                 String semester = scan.nextLine();
 
                 boolean classAdded = false;
+                boolean timeConflict = false;
                 for (Class c : classes) {
                     if (c.getName().equals(className) && c.getSection() == section && c.getSemester().equals(semester)) {
                         if (currentlyEditing.hasTimeConflict(c)) {
                             System.out.println("Class has a time conflict with current schedule");
+                            timeConflict = true;
                         } else {
                             currentlyEditing.addClass(c);
                             System.out.println("Class successfully added to schedule!");
@@ -361,7 +363,7 @@ public class Main {
                         }
                     }
                 }
-                if (!classAdded) {
+                if (!classAdded && !timeConflict) {
                     System.out.println("Class does not exist");
                 }
             } else if (input.equals("back")) {
