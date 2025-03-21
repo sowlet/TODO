@@ -421,7 +421,7 @@ public class Main {
             search.removeFilter(new DateFilter(Day.TR));
             search.removeFilter(new TimeFilter("00:00:00", "00:00:00"));
         } catch (Exception e){
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
