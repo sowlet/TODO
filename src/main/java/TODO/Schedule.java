@@ -1,6 +1,6 @@
 package TODO;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class Schedule {
 
@@ -56,13 +56,6 @@ public class Schedule {
 
 
         }
-        /* I do not understand this code, so I will leave it commented out
-            Buf if it doesn't, we can use this, though at that point, we might as well eliminate the hasClass method and combine them
-            for(int i = 0; i < classes.size(); i++) {
-                if((c.getCourseCode().equals(classes.get(i).getCourseCode())) && (c.getSection() == classes.get(i).getSection())) {
-                    classes.remove(i);
-                }
-            } */
     }
 
     /*
@@ -80,12 +73,6 @@ public class Schedule {
             }
         }
         return false;
-        /* I do not understand this code so I will comment it out
-        for(int i = 0; i < classes.size(); i++) {
-                if((c.getCourseCode().equals(classes.get(i).getCourseCode())) && (c.getSection() == classes.get(i).getSection())) {
-                    return true;
-                }
-        }*/
     }
 
 
@@ -102,11 +89,5 @@ public class Schedule {
             }
         }
         return false;
-        /* I do not understand this code so I will comment it out
-        for(int i = 0; i < classes.size(); i++) {
-            if((c.getDays().equals(classes.get(i).getDays())) && (c.getTime().equals(classes.get(i).getTime()))) {
-                return true;
-            }
-        } */
     }
 }
