@@ -218,7 +218,7 @@ public class Main {
         }
     }
 
-    public static void viewScheduleInCalendarFormat(Schedule schedule) {
+    public static void viewScheduleInCalendarFormatOLD(Schedule schedule) {
         System.out.println("Schedule: " + schedule.getName());
 
         // create map to store data for each class
@@ -229,6 +229,7 @@ public class Main {
             for (ClassTime t : c.getTimes()) {
                 String className = c.getName() + " " + c.getSection();
                 String time = c.getSubject() + " " + c.getNumber() + " " + c.getSection() + " " + t.getStartTime() + " - " + t.getEndTime();
+                String startTime = t.getStartTime();
                 String day = t.getDay();
 
                 if (!classData.containsKey(className)) {
@@ -250,7 +251,7 @@ public class Main {
         // display the schedule in a weekly calendar format
         System.out.println("Weekly Schedule:");
         System.out.println("-------------------------------------------------");
-        System.out.printf("%-40s|%-31s|%-31s|%-31s|%-31s|%-31s%n", "Class Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
+        System.out.printf("%-20s|%-35s|%-35s|%-35s|%-35s|%-35s%n", "Class Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
         System.out.println("-------------------------------------------------");
         // display classes per day
         for (String className : classData.keySet()) {
@@ -279,8 +280,70 @@ public class Main {
                         break;
                 }
             }
-            System.out.printf("%-40s|%-31s|%-31s|%-31s|%-31s|%-31s%n", className, days[0], days[1], days[2], days[3], days[4]);
+            System.out.printf("%-20s|%-35s|%-35s|%-35s|%-35s|%-35s%n", className, days[0], days[1], days[2], days[3], days[4]);
         }
+    }
+
+    public static void viewScheduleInCalendarFormat(Schedule schedule) {
+        System.out.println("Schedule: " + schedule.getName());
+        //Row across the top indicating the days of the week
+        System.out.println("Weekly Schedule:");
+        System.out.println("-------------------------------------------------");
+        System.out.printf("%-20s|%-30s|%-30s|%-30s|%-30s|%-30s%n", "Time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
+        System.out.println("-------------------------------------------------");
+
+        //Variables for each line that gets printed off
+        String time;
+
+        //Loop through each half hour
+        for(int i = 16; i < 42; i++) {
+           if(i % 2 == 0) {
+               time = (i / 2) + ":00:00";
+           } else {
+               time = (i / 2) + ":30:00";
+           }
+
+           //Creating the string for each day in here so that it gets reset for each line
+            String M = "";
+            String T = "";
+            String W = "";
+            String R = "";
+            String F = "";
+
+            //Look at each class and for each class's times check to see if they start at the half hour line we're on
+            //If so, add the class's name to show up under the appropriate column.
+           for(Class c : schedule.getClasses()) {
+               for (ClassTime t : c.getTimes()) {
+                   String startTime = t.getStartTime();
+                   if(startTime.equals(time)) {
+                       String day = t.getDay();
+                       switch (day) {
+                           case "M":
+                            M = c.getSubject() + " " + c.getNumber() + " " + c.getSection();
+                            break;
+                        case "T":
+                            T = c.getSubject() + " " + c.getNumber() + " " + c.getSection();
+                            break;
+                        case "W":
+                            W = c.getSubject() + " " + c.getNumber() + " " + c.getSection();
+                            break;
+                        case "R":
+                            R = c.getSubject() + " " + c.getNumber() + " " + c.getSection();
+                            break;
+                        case "F":
+                            F = c.getSubject() + " " + c.getNumber() + " " + c.getSection();
+                            break;
+                       }
+                   }
+               }
+           }
+
+            if((i % 2) == 1) {
+                time = "";
+            }
+            System.out.printf("%-20s|%-30s|%-30s|%-30s|%-30s|%-30s%n", time, M, T, W, R, F);
+        }
+
     }
 
     private static void createSchedule(Scanner scan, Account currentAccount) {
