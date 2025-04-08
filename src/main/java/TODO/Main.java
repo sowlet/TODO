@@ -31,36 +31,41 @@ public class Main {
 
         while (true) {
             while (currentAccount == null) {
-                System.out.println("Welcome!\nTo create an account: type 'create'\nTo login: type 'login'\nTo exit the application: type 'exit'");
+                System.out.println("Welcome!\nTo create an account: type 'c'\nTo login: type 'l'\nTo exit the application: type 'e'");
                 input = scan.nextLine();
 
-                if (input.equals("create")) {
-                    createAccount(scan);
-                } else if (input.equals("login")) {
-                    currentAccount = login(scan);
-                }else if (input.equals("exit")) {
-                    currentAccount = null;
-                    exit(0);
-                } else {
-                    System.out.println("Invalid input. Please try again.");
+                switch (input) {
+                    case "c":
+                        createAccount(scan);
+                        break;
+                    case "l":
+                        currentAccount = login(scan);
+                        break;
+                    case "e":
+                        exit(0);
+                    default:
+                        System.out.println("Invalid input. Please try again.");
                 }
             }
 
             while (currentAccount != null) {
                 System.out.println("Welcome " + currentAccount.getUsername() + "!");
-                System.out.println("Home:\nTo view your schedules: type 'schedules'\nTo view account info: type 'account'\nTo logout and save your changes: type 'logout'");
+                System.out.println("Home:\nTo view your schedules: type 's'\nTo view account info: type 'a'\nTo logout and save your changes: type 'l'");
                 input = scan.nextLine();
 
-                if (input.equals("schedules")) {
-                    manageSchedules(scan, currentAccount);
-                } else if (input.equals("account")) {
-                    // display account info
-                    viewAccount(scan, currentAccount);
-                } else if (input.equals("logout")) {
-                    updateAccountsToJson("src/main/java/TODO/data_accounts.json", accounts);
-                    currentAccount = null;
-                } else {
-                    System.out.println("Invalid input. Please try again.");
+                switch(input) {
+                    case "s":
+                        manageSchedules(scan, currentAccount);
+                        break;
+                    case "a":
+                        viewAccount(scan, currentAccount);
+                        break;
+                    case "l":
+                        updateAccountsToJson("src/main/java/TODO/data_accounts.json", accounts);
+                        currentAccount = null;
+                        break;
+                    default:
+                        System.out.println("Invalid input. Please try again.");
                 }
             }
         }
@@ -72,7 +77,7 @@ public class Main {
             System.out.println("Majors: " + account.getMajors());
             System.out.println("Minors: " + account.getMinors());
             System.out.println("Classes Taken: " + account.getClassesTaken());
-            System.out.println("To add a major: type 'add major'\nTo remove a major: type 'remove major'\nTo add a minor: type 'add minor'\nTo remove a minor: type 'remove minor'\nTo go back: type 'back'");
+            System.out.println("To add a major: type 'add major'\nTo remove a major: type 'remove major'\nTo add a minor: type 'add minor'\nTo remove a minor: type 'remove minor'\nTo go back: type 'b'");
 
             String input = scan.nextLine();
 
@@ -112,7 +117,7 @@ public class Main {
                 } else {
                     System.out.println("Minor does not exist");
                 }
-            } else if (input.equals("back")) {
+            } else if (input.equals("b")) {
                 break;
             } else {
                 System.out.println("Invalid input. Please try again.");
@@ -141,8 +146,8 @@ public class Main {
     }
 
     private static boolean usernameExists(String username) {
-        for(int i = 0; i < accounts.size(); i++) {
-            if(accounts.get(i).getUsername().equals(username)) {
+        for (Account account : accounts) {
+            if (account.getUsername().equals(username)) {
                 return true;
             }
         }
@@ -150,8 +155,8 @@ public class Main {
     }
 
     private static boolean emailExists(String email) {
-        for(int i = 0; i < accounts.size(); i++) {
-            if(accounts.get(i).getEmail().equals(email)) {
+        for (Account account : accounts) {
+            if (account.getEmail().equals(email)) {
                 return true;
             }
         }
@@ -177,21 +182,26 @@ public class Main {
     private static void manageSchedules(Scanner scan, Account currentAccount) {
         String input;
         while (true) {
-            System.out.println("Home/Schedules:\nTo view a schedule: type 'view'\nTo create a new schedule: type 'create'\nTo edit a schedule: type 'edit'\nTo delete a schedule: type 'delete'\nTo go back: type 'back'");
+            System.out.println("Home/Schedules:\nTo view a schedule: type 'v'\nTo create a new schedule: type 'c'\nTo edit a schedule: type 'e'\nTo delete a schedule: type 'd'\nTo go back: type 'b'");
             input = scan.nextLine();
 
-            if (input.equals("view")) {
-                viewSchedule(scan, currentAccount);
-            } else if (input.equals("create")) {
-                createSchedule(scan, currentAccount);
-            } else if (input.equals("edit")) {
-                editSchedule(scan, currentAccount);
-            } else if (input.equals("delete")) {
-                deleteSchedule(scan, currentAccount);
-            } else if (input.equals("back")) {
-                break;
-            } else {
-                System.out.println("Invalid input. Please try again.");
+            switch(input) {
+                case "v":
+                    viewSchedule(scan, currentAccount);
+                    break;
+                case "c":
+                    createSchedule(scan, currentAccount);
+                    break;
+                case "e":
+                    editSchedule(scan, currentAccount);
+                    break;
+                case "d":
+                    deleteSchedule(scan, currentAccount);
+                    break;
+                case "b":
+                    return;
+                default:
+                    System.out.println("Invalid input. Please try again.");
             }
         }
     }
@@ -217,72 +227,97 @@ public class Main {
             System.out.println("Schedule not found.");
         }
     }
-
-    public static void viewScheduleInCalendarFormatOLD(Schedule schedule) {
-        System.out.println("Schedule: " + schedule.getName());
-
-        // create map to store data for each class
-        Map<String, List<String>> classData = new HashMap<>();
-
-        // get the times, names, and days of the classes and add it to the respective class in the map
-        for (Class c : schedule.getClasses()) {
-            for (ClassTime t : c.getTimes()) {
-                String className = c.getName() + " " + c.getSection();
-                String time = c.getSubject() + " " + c.getNumber() + " " + c.getSection() + " " + t.getStartTime() + " - " + t.getEndTime();
-                String startTime = t.getStartTime();
-                String day = t.getDay();
-
-                if (!classData.containsKey(className)) {
-                    classData.put(className, new ArrayList<>());
-                }
-                classData.get(className).add(day + ": " + time);
-            }
-        }
-
-        // sort the class times
-        for (List<String> times : classData.values()) {
-            times.sort((time1, time2) -> {
-                String startTime1 = time1.split(": ")[1].split(" - ")[0];
-                String startTime2 = time2.split(": ")[1].split(" - ")[0];
-                return startTime1.compareTo(startTime2);
-            });
-        }
-
-        // display the schedule in a weekly calendar format
-        System.out.println("Weekly Schedule:");
-        System.out.println("-------------------------------------------------");
-        System.out.printf("%-20s|%-35s|%-35s|%-35s|%-35s|%-35s%n", "Class Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
-        System.out.println("-------------------------------------------------");
-        // display classes per day
-        for (String className : classData.keySet()) {
-            List<String> times = classData.get(className);
-            String[] days = new String[5];
-            Arrays.fill(days, ""); // Initialize days array with empty strings
-            for (String time : times) {
-                String[] parts = time.split(": ");
-                String day = parts[0];
-                String timeRange = parts[1];
-                switch (day) {
-                    case "M":
-                        days[0] += timeRange + " "; // Append time range to the respective day
-                        break;
-                    case "T":
-                        days[1] += timeRange + " ";
-                        break;
-                    case "W":
-                        days[2] += timeRange + " ";
-                        break;
-                    case "R":
-                        days[3] += timeRange + " ";
-                        break;
-                    case "F":
-                        days[4] += timeRange + " ";
-                        break;
-                }
-            }
-            System.out.printf("%-20s|%-35s|%-35s|%-35s|%-35s|%-35s%n", className, days[0], days[1], days[2], days[3], days[4]);
-        }
+//    private static void viewScheduleStreamlined(Scanner scan, Account currentAccount) {
+//        This had issues; dropping it to focus on actual new features
+//
+//        int scheduleNumber = 0;
+//        if(currentAccount.schedules.isEmpty()) {
+//            System.out.println("No schedules to view. Please create one.");
+//        } else {
+//            System.out.println("Enter the number of the schedule you would like to view: ");
+//            // display schedules
+//            for (int i = 0; i < currentAccount.schedules.size(); i++) {
+//                System.out.println((i + 1) + ": " + currentAccount.schedules.get(i).getName());
+//            }
+//            try{
+//                scheduleNumber = Integer.parseInt(scan.nextLine());
+//                if((scheduleNumber - 1) <= currentAccount.schedules.size() && (scheduleNumber - 1) >= 1) {
+//                    viewScheduleInCalendarFormat(currentAccount.schedules.get(scheduleNumber - 1));
+//
+//                } else {
+//                    System.out.println("Invalid schedule number");
+//                }
+//            } catch (NumberFormatException e) {
+//                System.out.println("Invalid input. Please enter a number.");
+//            }
+//        }
     }
+
+//    public static void viewScheduleInCalendarFormatOLD(Schedule schedule) {
+//        System.out.println("Schedule: " + schedule.getName());
+//
+//        // create map to store data for each class
+//        Map<String, List<String>> classData = new HashMap<>();
+//
+//        // get the times, names, and days of the classes and add it to the respective class in the map
+//        for (Class c : schedule.getClasses()) {
+//            for (ClassTime t : c.getTimes()) {
+//                String className = c.getName() + " " + c.getSection();
+//                String time = c.getSubject() + " " + c.getNumber() + " " + c.getSection() + " " + t.getStartTime() + " - " + t.getEndTime();
+//                String startTime = t.getStartTime();
+//                String day = t.getDay();
+//
+//                if (!classData.containsKey(className)) {
+//                    classData.put(className, new ArrayList<>());
+//                }
+//                classData.get(className).add(day + ": " + time);
+//            }
+//        }
+//
+//        // sort the class times
+//        for (List<String> times : classData.values()) {
+//            times.sort((time1, time2) -> {
+//                String startTime1 = time1.split(": ")[1].split(" - ")[0];
+//                String startTime2 = time2.split(": ")[1].split(" - ")[0];
+//                return startTime1.compareTo(startTime2);
+//            });
+//        }
+//
+//        // display the schedule in a weekly calendar format
+//        System.out.println("Weekly Schedule:");
+//        System.out.println("-------------------------------------------------");
+//        System.out.printf("%-20s|%-35s|%-35s|%-35s|%-35s|%-35s%n", "Class Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
+//        System.out.println("-------------------------------------------------");
+//        // display classes per day
+//        for (String className : classData.keySet()) {
+//            List<String> times = classData.get(className);
+//            String[] days = new String[5];
+//            Arrays.fill(days, ""); // Initialize days array with empty strings
+//            for (String time : times) {
+//                String[] parts = time.split(": ");
+//                String day = parts[0];
+//                String timeRange = parts[1];
+//                switch (day) {
+//                    case "M":
+//                        days[0] += timeRange + " "; // Append time range to the respective day
+//                        break;
+//                    case "T":
+//                        days[1] += timeRange + " ";
+//                        break;
+//                    case "W":
+//                        days[2] += timeRange + " ";
+//                        break;
+//                    case "R":
+//                        days[3] += timeRange + " ";
+//                        break;
+//                    case "F":
+//                        days[4] += timeRange + " ";
+//                        break;
+//                }
+//            }
+//            System.out.printf("%-20s|%-35s|%-35s|%-35s|%-35s|%-35s%n", className, days[0], days[1], days[2], days[3], days[4]);
+//        }
+//    }
 
     public static void viewScheduleInCalendarFormat(Schedule schedule) {
         System.out.println("Schedule: " + schedule.getName());
@@ -362,6 +397,29 @@ public class Main {
         System.out.println("Schedules:\n");
 
         // display schedules
+        //Again, this particular block of code was having issues; currently dropping it to focus on new features
+//        int scheduleNumber = 0;
+//        if(currentAccount.schedules.isEmpty()) {
+//            System.out.println("No schedules to edit. Please create one.");
+//            return;
+//        } else {
+//            System.out.println("Enter the number of the schedule you would like to view: ");
+//            // display schedules
+//            for (int i = 0; i < currentAccount.schedules.size(); i++) {
+//                System.out.println((i + 1) + ": " + currentAccount.schedules.get(i).getName());
+//            }
+//            try{
+//                scheduleNumber = Integer.parseInt(scan.nextLine());
+//                if(scheduleNumber - 1 > currentAccount.schedules.size() || scheduleNumber - 1 < 0) {
+//                    System.out.println("Invalid schedule number");
+//                } else {
+//                    currentlyEditing = currentAccount.schedules.get(scheduleNumber - 1);
+//                }
+//            } catch (NumberFormatException e) {
+//                System.out.println("Invalid input. Please enter a number.");
+//            }
+//        }
+
         for (Schedule schedule : currentAccount.schedules) {
             System.out.println(schedule.getName());
         }
@@ -377,18 +435,23 @@ public class Main {
 
         if (currentlyEditing != null) {
             String input;
+            label:
             while (true) {
-                System.out.println("Editing schedule: " + currentlyEditing.getName() +  "\n" + currentlyEditing.getClasses().toString() + "\nTo add a class: type 'add'\nTo remove a class: type 'remove'\nTo go back: type 'back'");
+                System.out.println("Editing schedule: " + currentlyEditing.getName() +  "\n" + currentlyEditing.getClasses().toString() + "\nTo add a class: type 'a'\nTo remove a class: type 'r'\nTo go back: type 'b'");
                 input = scan.nextLine();
 
-                if (input.equals("add")) {
-                    addClassToSchedule(scan);
-                } else if (input.equals("remove")) {
-                    removeClassFromSchedule(scan);
-                } else if (input.equals("back")) {
-                    break;
-                } else {
-                    System.out.println("Invalid input. Please try again.");
+                switch (input) {
+                    case "a":
+                        addClassToSchedule(scan);
+                        break;
+                    case "r":
+                        removeClassFromSchedule(scan);
+                        break;
+                    case "b":
+                        break label;
+                    default:
+                        System.out.println("Invalid input. Please try again.");
+                        break;
                 }
             }
         }
@@ -398,41 +461,44 @@ public class Main {
         search = new Search();
         String input;
         while (true) {
-            System.out.println("To search for classes: type 'search'\nTo add a class to the schedule: type 'add'\nTo go back: type 'back'");
+            System.out.println("To search for classes: type 's'\nTo add a class to the schedule: type 'a'\nTo go back: type 'b'");
             input = scan.nextLine();
 
-            if (input.equals("search")) {
-                searchClasses(scan);
-            } else if (input.equals("add")) {
-                System.out.println("Enter class name: ");
-                String className = scan.nextLine();
-                System.out.println("Enter class section: ");
-                char section = scan.nextLine().charAt(0);
-                System.out.println("Enter class semester: ");
-                String semester = scan.nextLine();
+            switch (input) {
+                case "s":
+                    searchClasses(scan);
+                    break;
+                case "a":
+                    System.out.println("Enter class name: ");
+                    String className = scan.nextLine();
+                    System.out.println("Enter class section: ");
+                    char section = scan.nextLine().charAt(0);
+                    System.out.println("Enter class semester: ");
+                    String semester = scan.nextLine();
 
-                boolean classAdded = false;
-                boolean timeConflict = false;
-                for (Class c : classes) {
-                    if (c.getName().equals(className) && c.getSection() == section && c.getSemester().equals(semester)) {
-                        if (currentlyEditing.hasTimeConflict(c)) {
-                            System.out.println("Class has a time conflict with current schedule");
-                            timeConflict = true;
-                        } else {
-                            currentlyEditing.addClass(c);
-                            System.out.println("Class successfully added to schedule!");
-                            classAdded = true;
-                            return;
+                    boolean classAdded = false;
+                    boolean timeConflict = false;
+                    for (Class c : classes) {
+                        if (c.getName().equals(className) && c.getSection() == section && c.getSemester().equals(semester)) {
+                            if (currentlyEditing.hasTimeConflict(c)) {
+                                System.out.println("Class has a time conflict with current schedule");
+                                timeConflict = true;
+                            } else {
+                                currentlyEditing.addClass(c);
+                                System.out.println("Class successfully added to schedule!");
+                                classAdded = true;
+                                return;
+                            }
                         }
                     }
-                }
-                if (!classAdded && !timeConflict) {
-                    System.out.println("Class does not exist");
-                }
-            } else if (input.equals("back")) {
-                break;
-            } else {
-                System.out.println("Invalid input. Please try again.");
+                    if (!classAdded && !timeConflict) {
+                        System.out.println("Class does not exist");
+                    }
+                    break;
+                case "b":
+                    break;
+                default:
+                    System.out.println("Invalid input. Please try again.");
             }
         }
     }
