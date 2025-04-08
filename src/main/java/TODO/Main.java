@@ -118,7 +118,7 @@ public class Main {
                     System.out.println("Minor does not exist");
                 }
             } else if (input.equals("b")) {
-                break;
+                return;
             } else {
                 System.out.println("Invalid input. Please try again.");
             }
@@ -251,7 +251,7 @@ public class Main {
 //                System.out.println("Invalid input. Please enter a number.");
 //            }
 //        }
-    }
+//    }
 
 //    public static void viewScheduleInCalendarFormatOLD(Schedule schedule) {
 //        System.out.println("Schedule: " + schedule.getName());
@@ -451,7 +451,7 @@ public class Main {
                         break label;
                     default:
                         System.out.println("Invalid input. Please try again.");
-                        break;
+                        return;
                 }
             }
         }
@@ -496,7 +496,7 @@ public class Main {
                     }
                     break;
                 case "b":
-                    break;
+                    return;
                 default:
                     System.out.println("Invalid input. Please try again.");
             }
