@@ -319,12 +319,12 @@ public class Main {
 //        }
 //    }
 
-    public static void viewScheduleInCalendarFormat(Schedule schedule) {
+    public static void viewScheduleInCalendarFormatUnSimplified(Schedule schedule) {
         System.out.println("Schedule: " + schedule.getName());
         //Row across the top indicating the days of the week
         System.out.println("Weekly Schedule:");
         System.out.println("-------------------------------------------------");
-        System.out.printf("%-20s|%-30s|%-30s|%-30s|%-30s|%-30s%n", "Time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
+        System.out.printf("%-10s|%-20s|%-20s|%-20s|%-20s|%-20s%n", "Time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
         System.out.println("-------------------------------------------------");
 
         //Variables for each line that gets printed off
@@ -376,9 +376,41 @@ public class Main {
             if((i % 2) == 1) {
                 time = "";
             }
-            System.out.printf("%-20s|%-30s|%-30s|%-30s|%-30s|%-30s%n", time, M, T, W, R, F);
+            System.out.printf("%-10s|%-20s|%-20s|%-20s|%-20s|%-20s%n", time, M, T, W, R, F);
         }
 
+    }
+
+    //Simplified above with copilot and modified to fix some parts
+    public static void viewScheduleInCalendarFormat(Schedule schedule) {
+        System.out.println("Schedule: " + schedule.getName());
+        System.out.println("Weekly Schedule:");
+        System.out.println("-------------------------------------------------");
+        System.out.printf("%-10s|%-20s|%-20s|%-20s|%-20s|%-20s%n", "Time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
+        System.out.println("-------------------------------------------------");
+
+        for (int i = 16; i < 42; i++) {
+            String time = (i % 2 == 0) ? (i / 2) + ":00:00" : (i / 2) + ":30:00";
+            String[] days = new String[5];
+            Arrays.fill(days, "");
+
+            for (Class c : schedule.getClasses()) {
+                for (ClassTime t : c.getTimes()) {
+                    if (t.getStartTime().equals(time)) {
+                        switch (t.getDay()) {
+                            case "M": days[0] = c.getSubject() + " " + c.getNumber() + " " + c.getSection(); break;
+                            case "T": days[1] = c.getSubject() + " " + c.getNumber() + " " + c.getSection(); break;
+                            case "W": days[2] = c.getSubject() + " " + c.getNumber() + " " + c.getSection(); break;
+                            case "R": days[3] = c.getSubject() + " " + c.getNumber() + " " + c.getSection(); break;
+                            case "F": days[4] = c.getSubject() + " " + c.getNumber() + " " + c.getSection(); break;
+                        }
+                    }
+                }
+            }
+
+            if (i % 2 == 1) time = "";
+            System.out.printf("%-10s|%-20s|%-20s|%-20s|%-20s|%-20s%n", time, days[0], days[1], days[2], days[3], days[4]);
+        }
     }
 
     private static void createSchedule(Scanner scan, Account currentAccount) {
@@ -463,7 +495,6 @@ public class Main {
         while (true) {
             System.out.println("To search for classes: type 's'\nTo add a class to the schedule: type 'a'\nTo go back: type 'b'");
             input = scan.nextLine();
-
             switch (input) {
                 case "s":
                     searchClasses(scan);
@@ -482,6 +513,9 @@ public class Main {
                         if (c.getName().equals(className) && c.getSection() == section && c.getSemester().equals(semester)) {
                             if (currentlyEditing.hasTimeConflict(c)) {
                                 System.out.println("Class has a time conflict with current schedule");
+                                timeConflict = true;
+                            } else if (currentlyEditing.hasSemesterConflict(c)) {
+                                System.out.println("Classes of different semesters cannot be added to the same schedule");
                                 timeConflict = true;
                             } else {
                                 currentlyEditing.addClass(c);
@@ -502,6 +536,7 @@ public class Main {
             }
         }
     }
+                    
 
     private static void searchClasses(Scanner scan) {
         try {
