@@ -7,6 +7,7 @@ public class Schedule {
 
     // Variables
     private ArrayList<Class> classes;
+    private ArrayList<CustomEvents> customEvents;
     private String name;
 
 
@@ -14,12 +15,17 @@ public class Schedule {
     public Schedule(String newName) {
         this.name = newName;
         this.classes = new ArrayList<>();
+        this.customEvents = new ArrayList<>();
     }
 
 
     // getters and setters
     public ArrayList<Class> getClasses() {
         return classes;
+    }
+
+    public ArrayList<CustomEvents> getCustomEvents() {
+        return customEvents;
     }
 
     public String getName() {
