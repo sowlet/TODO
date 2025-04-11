@@ -90,4 +90,19 @@ public class Schedule {
         }
         return false;
     }
+
+    /*
+    checks whether the given class matches the semester of the other classes in the schedule
+
+    @param c class to be checked
+    @return true if there is a semester conflict between the given class or false if they all match
+     */
+    public boolean hasSemesterConflict(Class c) {
+        for (Class scheduleClass: classes) {
+            if (!c.getSemester().equals(scheduleClass.getSemester())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

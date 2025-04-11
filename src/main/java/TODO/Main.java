@@ -450,6 +450,9 @@ public class Main {
                         if (currentlyEditing.hasTimeConflict(c)) {
                             System.out.println("Class has a time conflict with current schedule");
                             timeConflict = true;
+                        } else if (currentlyEditing.hasSemesterConflict(c)) {
+                            System.out.println("Classes of different semesters cannot be added to the same schedule");
+                            timeConflict = true;
                         } else {
                             currentlyEditing.addClass(c);
                             System.out.println("Class successfully added to schedule!");
