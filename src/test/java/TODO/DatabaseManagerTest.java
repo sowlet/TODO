@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.sql.*;
@@ -209,6 +210,42 @@ public class DatabaseManagerTest{
 
         for(int i = 0; i < classes.size(); i++) {
             dm.addClassToDatabase(classes.get(i), i);
+        }
+    }
+
+    //Test that a custom event can be added to a schedule
+    @Test
+    void addCustomEventToSchedule() throws SQLException, FileNotFoundException {
+        dm.createAllTables();
+
+        dm.addScheduleToDatabase("karlyripper", "my2025spring");
+        dm.addCustomEvent("karlyripper", "my2025spring", "Scrum", "HBL 132", "W", "9:00:00", "9:15:00");
+
+        String queryCustomEvent = "SELECT  FROM customEvents WHERE username = ? AND schedule_name = ? AND event_name = ?";
+        String queryCustomEventTime = "SELECT * FROM customEventsTimes WHERE event_id = ?";
+
+        int eventID = 0;
+        try(PreparedStatement prepEvent = dm.db.prepareStatement(queryCustomEvent)) {
+            prepEvent.setString(1, "karlyripper");
+            prepEvent.setString(2, "my2025spring");
+            prepEvent.setString(3, "Scrum");
+            ResultSet rs = prepEvent.executeQuery();
+            assertTrue(rs.next());
+            eventID = rs.getInt("event_id");
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        try(PreparedStatement prepEventTime = dm.db.prepareStatement(queryCustomEventTime)) {
+            prepEventTime.setInt(1, eventID);
+            ResultSet rsTime = prepEventTime.executeQuery();
+            assertTrue(rsTime.next());
+            assertEquals("W", rsTime.getString("day"));
+            assertEquals("9:00:00", rsTime.getString("start_time"));
+            assertEquals("9:15:00", rsTime.getString("end_time"));
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
     }
 }
