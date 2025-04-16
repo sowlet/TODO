@@ -1,12 +1,14 @@
 package TODO;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import io.javalin.Javalin;
 
 import static java.lang.System.exit;
 
@@ -16,11 +18,49 @@ public class Main {
     public static Schedule currentlyEditing = null;
     public static Search search;
     public static ArrayList<Class> searchResults = new ArrayList<>();
+    public static DatabaseManager dm = null;
 
     public static void main(String[] args) throws FileNotFoundException {
         loadClassesFromJson("src/main/java/TODO/data_wolfe.json", classes);
         loadAccountsFromJson("src/main/java/TODO/data_accounts.json", accounts);
         System.out.println(getSubjects());
+
+        //create new database manager object
+        try{
+            dm = new DatabaseManager();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        //add all classes to the database
+        dm.dropAllTables();
+        dm.createAllTables();
+        for (int i = 0; i < classes.size(); i++){
+            dm.addClassToDatabase(classes.get(i), i);
+        }
+
+        search = new Search();
+
+//        Javalin app = Javalin.create(config -> {
+//            config.bundledPlugins.enableCors(cors -> {
+//                cors.addRule(it -> {
+//                    it.allowHost("http://localhost:4200");
+//                });
+//            });
+//        }).start(7070);
+
+//        app.post("/api/search", ctx -> {
+//            ctx.result("Test Class Info");
+//        });
+
+//        app.get("/api/greeting", ctx -> {
+//            ctx.json(search);
+//        });
+
+        //app.post("/search", search.search());
+
+        //search.registerRoutes(app);
+
         run();
     }
 
@@ -42,6 +82,7 @@ public class Main {
                         currentAccount = login(scan);
                         break;
                     case "e":
+                        dm.closeConnection();
                         exit(0);
                     default:
                         System.out.println("Invalid input. Please try again.");
