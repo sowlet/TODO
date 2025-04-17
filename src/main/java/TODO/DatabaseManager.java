@@ -1,5 +1,7 @@
 package TODO;
 
+import com.google.gson.*;
+
 import java.sql.*;
 
 public class DatabaseManager {
@@ -99,8 +101,7 @@ public class DatabaseManager {
             stat.execute(drop_schedules_table);
             stat.execute(drop_scheduledClasses_table);
             stat.execute(drop_majorsAndMinors_table);
-        } catch (
-                SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error creating tables: " + e.getMessage());
         }
     }
@@ -356,6 +357,99 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.out.println("Error removing from the majorsAndMinors table: " + e.getMessage());
         }
+    }
+
+    //search method
+    public JsonArray search(String name){
+        String search_classes = "SELECT * FROM classes WHERE name LIKE ?";
+        String search_classTimes = "SELECT * FROM classTimes WHERE id=?";
+        String search_faculty = "SELECT * FROM faculty WHERE id=?";
+        int classID = 0;
+
+        JsonArray searchResults = new JsonArray();
+        JsonArray times = new JsonArray();
+        JsonArray facs = new JsonArray();
+        String colName = "";
+        Object value = null;
+
+        try(PreparedStatement classPrep = db.prepareStatement(search_classes)){
+            classPrep.setString(1, "%" + name + "%");
+            ResultSet classResults = classPrep.executeQuery();
+
+            ResultSetMetaData classMD= classResults.getMetaData();
+            int numClassCols = classMD.getColumnCount();
+
+            //TODO: add filters here
+
+            /*iterate through the classes to get their times and faculty and
+            * return them in json format*/
+
+            while(classResults.next()){
+                classID = classResults.getInt("id");
+
+                JsonObject classObj = new JsonObject();
+                for(int i = 2; i <= numClassCols; i++){
+                    colName = classMD.getColumnName(i);
+                    value = classResults.getObject(i);
+                    classObj.addProperty(colName, value != null ? value.toString() : null);
+                }
+
+                //add classTIme and faculty properties
+
+                //get the classTimes of the class
+                try(PreparedStatement timesPrep = db.prepareStatement(search_classTimes)){
+                    timesPrep.setString(1, "%" + name + "%");
+                    ResultSet timeResults = timesPrep.executeQuery();
+
+                    ResultSetMetaData timeMD= timeResults.getMetaData();
+                    int numTimeCols = timeMD.getColumnCount();
+
+                    while(timeResults.next()){
+                        JsonObject classTimeObj = new JsonObject();
+                        for(int i = 2; i <= numTimeCols; i++){
+                            colName = timeMD.getColumnName(i);
+                            value = timeResults.getObject(i);
+                            classTimeObj.addProperty(colName, value != null ? value.toString() : null);
+                        }
+                        times.add(classTimeObj);
+                    }
+                    classObj.add("classTimes", times);
+
+                    //classObj.addProperty("", )
+                }catch (SQLException e){
+                    System.out.println("Error searching the classTimes table: " + e.getMessage());
+                }
+
+                //get the faculty of the class
+                try(PreparedStatement facPrep = db.prepareStatement(search_faculty)){
+                    facPrep.setString(1, "%" + name + "%");
+                    ResultSet facResults = facPrep.executeQuery();
+
+                    ResultSetMetaData facMD= facResults.getMetaData();
+                    int numFacCols = facMD.getColumnCount();
+
+                    while(facResults.next()){
+                        JsonObject facultyObj = new JsonObject();
+                        for(int i = 2; i <= numFacCols; i++){
+                            colName = facMD.getColumnName(i);
+                            value = facResults.getObject(i);
+                            facultyObj.addProperty(colName, value != null ? value.toString() : null);
+                        }
+                        facs.add(facultyObj);
+                    }
+                    classObj.add("faculty", facs);
+
+                }catch (SQLException e){
+                    System.out.println("Error searching the faculty table: " + e.getMessage());
+                }
+
+                searchResults.add(classObj);
+            }
+        }catch (SQLException e){
+            System.out.println("Error searching the classes table: " + e.getMessage());
+        }
+
+        return searchResults;
     }
 
     public void printClassInfo(){
