@@ -9,6 +9,7 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import io.javalin.Javalin;
+import io.javalin.http.Context;
 
 import static java.lang.System.exit;
 
@@ -19,6 +20,7 @@ public class Main {
     public static Search search;
     public static ArrayList<Class> searchResults = new ArrayList<>();
     public static DatabaseManager dm = null;
+    public static SearchController sc = null;
 
     public static void main(String[] args) throws FileNotFoundException {
 //        loadClassesFromJson("src/main/java/TODO/data_wolfe.json", classes);
@@ -28,11 +30,17 @@ public class Main {
         //create new database manager object
         try{
             dm = new DatabaseManager();
+            sc = new SearchController(dm);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         //add all classes to the database
+//        dm.dropAllTables();
+//        dm.createAllTables();
+//        for (int i = 0; i < classes.size(); i++){
+//            dm.addClassToDatabase(classes.get(i), i);
+//        }
 //        dm.dropAllTables();
 //        dm.createAllTables();
 //        for (int i = 0; i < classes.size(); i++){
@@ -49,19 +57,29 @@ public class Main {
 //            });
 //        }).start(7070);
 
-//        app.post("/api/search", ctx -> {
-//            ctx.result("Test Class Info");
-//        });
+        Javalin app = Javalin.create(config -> {
+            config.bundledPlugins.enableCors(cors -> {
+                cors.addRule(it -> {
+                    it.allowHost("http://localhost:4200");
+                });
+            });
+        }).start(7070);
 
-//        app.get("/api/greeting", ctx -> {
-//            ctx.json(search);
-//        });
+        sc.registerRoutes(app);
 
-        //app.post("/search", search.search());
+        //run();
 
-        //search.registerRoutes(app);
+        System.out.println("To exit the application: type 'e'");
+        Scanner scan = new Scanner(System.in);
+        String input = scan.nextLine();
 
-        run();
+        switch (input) {
+            case "e":
+                dm.closeConnection();
+                exit(0);
+            default:
+                System.out.println("Invalid input. Please try again.");
+        }
     }
 
     public static void run() throws FileNotFoundException {
