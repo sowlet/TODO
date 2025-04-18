@@ -83,9 +83,8 @@ public class DatabaseManager {
             + "FOREIGN KEY (username) REFERENCES schedules(username),\n"
             + "FOREIGN KEY (scheduleName) REFERENCES schedules(scheduleName)\n)";
 
-    String create_customEventsTimes_table = "CREATE TABLE IF NOT EXISTS classTimes (\n"
-            + "id INTEGER, \n"
-            + "time_id INTEGER PRIMARY KEY AUTOINCREMENT, \n"
+    String create_customEventsTimes_table = "CREATE TABLE IF NOT EXISTS customEventsTimes (\n"
+            + "id INTEGER PRIMARY KEY AUTOINCREMENT, \n"
             + "day TEXT NOT NULL,\n"
             + "end_time TEXT NOT NULL,\n"
             + "start_time TEXT NOT NULL,\n"
@@ -423,7 +422,7 @@ public class DatabaseManager {
             System.out.println("Error adding to the customEvents table: " + e.getMessage());
         }
 
-        String insert_customEventTimes = "INSERT INTO customEventsTimes (day, start_time, start_time) VALUES (?,?,?)";
+        String insert_customEventTimes = "INSERT INTO customEventsTimes (day, start_time, end_time) VALUES (?,?,?)";
         try (PreparedStatement prep = db.prepareStatement(insert_customEventTimes)) {
             prep.setString(1, day);
             prep.setString(2, startTime);
@@ -434,24 +433,23 @@ public class DatabaseManager {
         }
     }
 
-    public void removeCustomEvent(String username, String scheduleName, String eventName, String location, String day, String startTime, String endTime) {
-        String delete_customEvent = "DELETE FROM customEvents (username, scheduleName, eventName, location) VALUES (?,?,?,?)";
+    /*
+    @param int id the id of the custom event to be removed
+     */
+    public void removeCustomEvent(int id) {
+        String delete_customEvent = "DELETE FROM customEvents WHERE id=?";
+        String delete_customEventTime = "DELETE FROM customEventsTimes WHERE id=?";
 
         try (PreparedStatement prep = db.prepareStatement(delete_customEvent)) {
-            prep.setString(1, username);
-            prep.setString(2, scheduleName);
-            prep.setString(3, eventName);
-            prep.setString(4, location);
+            prep.setInt(1, id);
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error removing from the customEvents table: " + e.getMessage());
         }
 
-        String delete_customEventTimes = "DELETE FROM customEventsTimes (day, start_time, start_time) VALUES (?,?,?)";
-        try (PreparedStatement prep = db.prepareStatement(delete_customEventTimes)) {
-            prep.setString(1, day);
-            prep.setString(2, startTime);
-            prep.setString(3, endTime);
+
+        try (PreparedStatement prep = db.prepareStatement(delete_customEventTime)) {
+            prep.setInt(1, id);
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error removing from the customEventsTimes table: " + e.getMessage());

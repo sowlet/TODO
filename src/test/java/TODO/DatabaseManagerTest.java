@@ -221,8 +221,8 @@ public class DatabaseManagerTest{
         dm.addScheduleToDatabase("karlyripper", "my2025spring");
         dm.addCustomEvent("karlyripper", "my2025spring", "Scrum", "HBL 132", "W", "9:00:00", "9:15:00");
 
-        String queryCustomEvent = "SELECT  FROM customEvents WHERE username = ? AND schedule_name = ? AND event_name = ?";
-        String queryCustomEventTime = "SELECT * FROM customEventsTimes WHERE event_id = ?";
+        String queryCustomEvent = "SELECT * FROM customEvents WHERE username = ? AND scheduleName = ? AND eventName = ?";
+        String queryCustomEventTime = "SELECT * FROM customEventsTimes WHERE id = ?";
 
         int eventID = 0;
         try(PreparedStatement prepEvent = dm.db.prepareStatement(queryCustomEvent)) {
@@ -230,8 +230,11 @@ public class DatabaseManagerTest{
             prepEvent.setString(2, "my2025spring");
             prepEvent.setString(3, "Scrum");
             ResultSet rs = prepEvent.executeQuery();
-            assertTrue(rs.next());
-            eventID = rs.getInt("event_id");
+
+            assertEquals("karlyripper", rs.getString("username"));
+            assertEquals("my2025spring", rs.getString("scheduleName"));
+            assertEquals("Scrum", rs.getString("eventName"));
+            eventID = rs.getInt("id");
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -240,12 +243,58 @@ public class DatabaseManagerTest{
         try(PreparedStatement prepEventTime = dm.db.prepareStatement(queryCustomEventTime)) {
             prepEventTime.setInt(1, eventID);
             ResultSet rsTime = prepEventTime.executeQuery();
-            assertTrue(rsTime.next());
             assertEquals("W", rsTime.getString("day"));
             assertEquals("9:00:00", rsTime.getString("start_time"));
             assertEquals("9:15:00", rsTime.getString("end_time"));
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    @Test
+    void removeCustomEvent() throws SQLException, FileNotFoundException {
+        dm.createAllTables();
+
+        dm.addScheduleToDatabase("karlyripper", "my2025spring");
+        dm.addCustomEvent("karlyripper", "my2025spring", "Scrum", "HBL 132", "W", "9:00:00", "9:15:00");
+
+        int eventID = 0;
+        String queryCustomEvent = "SELECT * FROM customEvents WHERE username=? AND scheduleName=? AND eventName=?";
+        try(PreparedStatement prepEvent = dm.db.prepareStatement(queryCustomEvent)) {
+            prepEvent.setString(1, "karlyripper");
+            prepEvent.setString(2, "my2025spring");
+            prepEvent.setString(3, "Scrum");
+            ResultSet rs = prepEvent.executeQuery();
+            eventID = rs.getInt("id");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        dm.removeCustomEvent(eventID);
+        try(PreparedStatement prepEvent = dm.db.prepareStatement(queryCustomEvent)) {
+            prepEvent.setString(1, "karlyripper");
+            prepEvent.setString(2, "my2025spring");
+            prepEvent.setString(3, "Scrum");
+            ResultSet rs = prepEvent.executeQuery();
+
+            assertNull(rs.getString("username"));
+            assertNull(rs.getString("scheduleName"));
+            assertNull(rs.getString("eventName"));
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        String queryCustomEventTime = "SELECT * FROM customEventsTimes WHERE id=?";
+        try(PreparedStatement prepEventTime = dm.db.prepareStatement(queryCustomEventTime)) {
+            prepEventTime.setInt(1, eventID);
+            ResultSet rsTime = prepEventTime.executeQuery();
+            assertNull(rsTime.getString("day"));
+            assertNull(rsTime.getString("start_time"));
+            assertNull(rsTime.getString("end_time"));
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 }

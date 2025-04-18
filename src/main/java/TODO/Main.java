@@ -21,9 +21,9 @@ public class Main {
     public static DatabaseManager dm = null;
 
     public static void main(String[] args) throws FileNotFoundException {
-        loadClassesFromJson("src/main/java/TODO/data_wolfe.json", classes);
-        loadAccountsFromJson("src/main/java/TODO/data_accounts.json", accounts);
-        System.out.println(getSubjects());
+//        loadClassesFromJson("src/main/java/TODO/data_wolfe.json", classes);
+//        loadAccountsFromJson("src/main/java/TODO/data_accounts.json", accounts);
+//        System.out.println(getSubjects());
 
         //create new database manager object
         try{
@@ -33,13 +33,13 @@ public class Main {
         }
 
         //add all classes to the database
-        dm.dropAllTables();
-        dm.createAllTables();
-        for (int i = 0; i < classes.size(); i++){
-            dm.addClassToDatabase(classes.get(i), i);
-        }
-
-        search = new Search();
+//        dm.dropAllTables();
+//        dm.createAllTables();
+//        for (int i = 0; i < classes.size(); i++){
+//            dm.addClassToDatabase(classes.get(i), i);
+//        }
+//
+//        search = new Search();
 
 //        Javalin app = Javalin.create(config -> {
 //            config.bundledPlugins.enableCors(cors -> {
