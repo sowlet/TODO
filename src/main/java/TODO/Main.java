@@ -41,6 +41,21 @@ public class Main {
 //        for (int i = 0; i < classes.size(); i++){
 //            dm.addClassToDatabase(classes.get(i), i);
 //        }
+//        dm.dropAllTables();
+//        dm.createAllTables();
+//        for (int i = 0; i < classes.size(); i++){
+//            dm.addClassToDatabase(classes.get(i), i);
+//        }
+//
+//        search = new Search();
+
+//        Javalin app = Javalin.create(config -> {
+//            config.bundledPlugins.enableCors(cors -> {
+//                cors.addRule(it -> {
+//                    it.allowHost("http://localhost:4200");
+//                });
+//            });
+//        }).start(7070);
 
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {

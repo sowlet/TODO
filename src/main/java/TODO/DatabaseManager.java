@@ -75,6 +75,24 @@ public class DatabaseManager {
             + "PRIMARY KEY (username, mName, isMajor),\n"
             + "FOREIGN KEY (username) REFERENCES accounts(username)\n)";
 
+    //Custom events tables
+    String create_customEvents_table = "CREATE TABLE IF NOT EXISTS customEvents (\n"
+            + "username TEXT NOT NULL,\n"
+            + "scheduleName TEXT NOT NULL,\n"
+            + "id INTEGER PRIMARY KEY AUTOINCREMENT,\n" //Custom events times table are referencing this table
+            + "eventName TEXT NOT NULL,\n"
+            + "location TEXT,\n"
+            + "FOREIGN KEY (username) REFERENCES schedules(username),\n"
+            + "FOREIGN KEY (scheduleName) REFERENCES schedules(scheduleName)\n)";
+
+    String create_customEventsTimes_table = "CREATE TABLE IF NOT EXISTS customEventsTimes (\n"
+            + "id INTEGER PRIMARY KEY AUTOINCREMENT, \n"
+            + "day TEXT NOT NULL,\n"
+            + "end_time TEXT NOT NULL,\n"
+            + "start_time TEXT NOT NULL,\n"
+            + "FOREIGN KEY (id) REFERENCES customEvents(id)\n)";
+
+
 
     //constructor (establishes a connection to the database)
     public DatabaseManager() throws SQLException {
@@ -91,6 +109,8 @@ public class DatabaseManager {
         String drop_schedules_table = "DROP TABLE IF EXISTS schedules";
         String drop_scheduledClasses_table = "DROP TABLE IF EXISTS scheduledClasses";
         String drop_majorsAndMinors_table = "DROP TABLE IF EXISTS majorsAndMinors";
+        String drop_customEvents_table = "DROP TABLE IF EXISTS customEvents";
+        String drop_customEventsTimes_table = "DROP TABLE IF EXISTS customEventsTimes";
 
         try(Statement stat = db.createStatement()){
             stat.execute(drop_classes_table);
@@ -101,6 +121,8 @@ public class DatabaseManager {
             stat.execute(drop_schedules_table);
             stat.execute(drop_scheduledClasses_table);
             stat.execute(drop_majorsAndMinors_table);
+            stat.execute(drop_customEvents_table);
+            stat.execute(drop_customEventsTimes_table);
         } catch (SQLException e) {
             System.out.println("Error creating tables: " + e.getMessage());
         }
@@ -134,6 +156,8 @@ public class DatabaseManager {
             stat.execute(create_schedules_table);
             stat.execute(create_scheduledClasses_table);
             stat.execute(create_majorsAndMinors_table);
+            stat.execute(create_customEvents_table);
+            stat.execute(create_customEventsTimes_table);
         } catch (SQLException e) {
             System.out.println("Error creating tables: " + e.getMessage());
         }
@@ -478,6 +502,57 @@ public class DatabaseManager {
             System.out.println("Error selecting from classes: " + e.getMessage());
         }
     }
+
+    public void addCustomEvent(String username, String scheduleName, String eventName, String location, String day, String startTime, String endTime) {
+        String insert_customEvent = "INSERT INTO customEvents (username, scheduleName, eventName, location) VALUES (?,?,?,?)";
+
+        try (PreparedStatement prep = db.prepareStatement(insert_customEvent)) {
+            prep.setString(1, username);
+            prep.setString(2, scheduleName);
+            prep.setString(3, eventName);
+            prep.setString(4, location);
+            prep.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error adding to the customEvents table: " + e.getMessage());
+        }
+
+        String insert_customEventTimes = "INSERT INTO customEventsTimes (day, start_time, end_time) VALUES (?,?,?)";
+        try (PreparedStatement prep = db.prepareStatement(insert_customEventTimes)) {
+            prep.setString(1, day);
+            prep.setString(2, startTime);
+            prep.setString(3, endTime);
+            prep.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error adding to the customEventsTimes table: " + e.getMessage());
+        }
+    }
+
+    /*
+    @param int id the id of the custom event to be removed
+     */
+    public void removeCustomEvent(int id) {
+        String delete_customEvent = "DELETE FROM customEvents WHERE id=?";
+        String delete_customEventTime = "DELETE FROM customEventsTimes WHERE id=?";
+
+        try (PreparedStatement prep = db.prepareStatement(delete_customEvent)) {
+            prep.setInt(1, id);
+            prep.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error removing from the customEvents table: " + e.getMessage());
+        }
+
+
+        try (PreparedStatement prep = db.prepareStatement(delete_customEventTime)) {
+            prep.setInt(1, id);
+            prep.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error removing from the customEventsTimes table: " + e.getMessage());
+        }
+    }
+
+
+
+
 
 
 

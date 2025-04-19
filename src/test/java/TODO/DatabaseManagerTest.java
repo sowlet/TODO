@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.sql.*;
@@ -337,5 +338,90 @@ public class DatabaseManagerTest{
         for(int i = 0; i < classes.size(); i++) {
             dm.addClassToDatabase(classes.get(i), i);
         }
+    }
+
+    //Test that a custom event can be added to a schedule
+    @Test
+    void addCustomEventToSchedule() throws SQLException, FileNotFoundException {
+        dm.createAllTables();
+
+        dm.addScheduleToDatabase("karlyripper", "my2025spring");
+        dm.addCustomEvent("karlyripper", "my2025spring", "Scrum", "HBL 132", "W", "9:00:00", "9:15:00");
+
+        String queryCustomEvent = "SELECT * FROM customEvents WHERE username = ? AND scheduleName = ? AND eventName = ?";
+        String queryCustomEventTime = "SELECT * FROM customEventsTimes WHERE id = ?";
+
+        int eventID = 0;
+        try(PreparedStatement prepEvent = dm.db.prepareStatement(queryCustomEvent)) {
+            prepEvent.setString(1, "karlyripper");
+            prepEvent.setString(2, "my2025spring");
+            prepEvent.setString(3, "Scrum");
+            ResultSet rs = prepEvent.executeQuery();
+
+            assertEquals("karlyripper", rs.getString("username"));
+            assertEquals("my2025spring", rs.getString("scheduleName"));
+            assertEquals("Scrum", rs.getString("eventName"));
+            eventID = rs.getInt("id");
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        try(PreparedStatement prepEventTime = dm.db.prepareStatement(queryCustomEventTime)) {
+            prepEventTime.setInt(1, eventID);
+            ResultSet rsTime = prepEventTime.executeQuery();
+            assertEquals("W", rsTime.getString("day"));
+            assertEquals("9:00:00", rsTime.getString("start_time"));
+            assertEquals("9:15:00", rsTime.getString("end_time"));
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Test
+    void removeCustomEvent() throws SQLException, FileNotFoundException {
+        dm.createAllTables();
+
+        dm.addScheduleToDatabase("karlyripper", "my2025spring");
+        dm.addCustomEvent("karlyripper", "my2025spring", "Scrum", "HBL 132", "W", "9:00:00", "9:15:00");
+
+        int eventID = 0;
+        String queryCustomEvent = "SELECT * FROM customEvents WHERE username=? AND scheduleName=? AND eventName=?";
+        try(PreparedStatement prepEvent = dm.db.prepareStatement(queryCustomEvent)) {
+            prepEvent.setString(1, "karlyripper");
+            prepEvent.setString(2, "my2025spring");
+            prepEvent.setString(3, "Scrum");
+            ResultSet rs = prepEvent.executeQuery();
+            eventID = rs.getInt("id");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        dm.removeCustomEvent(eventID);
+        try(PreparedStatement prepEvent = dm.db.prepareStatement(queryCustomEvent)) {
+            prepEvent.setString(1, "karlyripper");
+            prepEvent.setString(2, "my2025spring");
+            prepEvent.setString(3, "Scrum");
+            ResultSet rs = prepEvent.executeQuery();
+
+            assertNull(rs.getString("username"));
+            assertNull(rs.getString("scheduleName"));
+            assertNull(rs.getString("eventName"));
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        String queryCustomEventTime = "SELECT * FROM customEventsTimes WHERE id=?";
+        try(PreparedStatement prepEventTime = dm.db.prepareStatement(queryCustomEventTime)) {
+            prepEventTime.setInt(1, eventID);
+            ResultSet rsTime = prepEventTime.executeQuery();
+            assertNull(rsTime.getString("day"));
+            assertNull(rsTime.getString("start_time"));
+            assertNull(rsTime.getString("end_time"));
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 }
