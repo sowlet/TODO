@@ -21,32 +21,29 @@ public class Main {
     public static ArrayList<Class> searchResults = new ArrayList<>();
     public static DatabaseManager dm = null;
     public static SearchController sc = null;
+    public static AccountController ac = null;
 
     public static void main(String[] args) throws FileNotFoundException {
-//        loadClassesFromJson("src/main/java/TODO/data_wolfe.json", classes);
-//        loadAccountsFromJson("src/main/java/TODO/data_accounts.json", accounts);
-//        System.out.println(getSubjects());
+        loadClassesFromJson("src/main/java/TODO/data_wolfe.json", classes);
+        loadAccountsFromJson("src/main/java/TODO/data_accounts.json", accounts);
+        System.out.println(getSubjects());
 
         //create new database manager object
         try{
             dm = new DatabaseManager();
             sc = new SearchController(dm);
+            ac = new AccountController(dm);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         //add all classes to the database
-//        dm.dropAllTables();
-//        dm.createAllTables();
-//        for (int i = 0; i < classes.size(); i++){
-//            dm.addClassToDatabase(classes.get(i), i);
-//        }
-//        dm.dropAllTables();
-//        dm.createAllTables();
-//        for (int i = 0; i < classes.size(); i++){
-//            dm.addClassToDatabase(classes.get(i), i);
-//        }
-//
+        dm.dropAllTables();
+        dm.createAllTables();
+        for (int i = 0; i < classes.size(); i++){
+            dm.addClassToDatabase(classes.get(i), i);
+        }
+
 //        search = new Search();
 
 //        Javalin app = Javalin.create(config -> {
@@ -66,6 +63,7 @@ public class Main {
         }).start(7070);
 
         sc.registerRoutes(app);
+        ac.registerRoutes(app);
 
         //run();
 

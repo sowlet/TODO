@@ -1,5 +1,6 @@
 package TODO;
-
+//import io.javalin.Javalin;
+//import io.javalin.http.Context;
 import java.util.ArrayList;
 
 public class Search {
@@ -19,7 +20,6 @@ public class Search {
     }
 
 
-
     /*
     searches through classes and returns an ArrayList of results based on query and stored filters
 
@@ -27,6 +27,24 @@ public class Search {
     @param classes the global ArrayList of classes
     @return an ArrayList of matching classes that pass the stored filters
      */
+//    public ArrayList<Class> search(String query, ArrayList<Class> classes) {
+//        this.query = query.toUpperCase();
+//
+//        for (Class c: classes) {
+//            if (c.getName().contains(query)) {
+//                searchResults.add(c);
+//            }
+//        }
+//
+//        filterResults = searchResults;
+//
+//        for (Filter f: filters) {
+//            filterResults = f.filt(filterResults);
+//        }
+//
+//        return filterResults;
+//    }
+
     public ArrayList<Class> search(String query, ArrayList<Class> classes) {
         this.query = query.toUpperCase();
 

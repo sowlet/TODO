@@ -131,11 +131,22 @@ public class DatabaseManagerTest{
         dm.addClassToDatabase(c, 0);
 
 
-        dm.addAccountToDatabase("karlyripper", "yolo12", "ripper@email.com");
-        dm.addScheduleToDatabase("karlyripper", "my2025spring");
+        assertNull(dm.validAccount("karlyripper", "yolo12"));
+        assertTrue(dm.addAccountToDatabase("karlyripper", "yolo12", "ripper@email.com"));
+        assertEquals("karlyripper", dm.validAccount("karlyripper", "yolo12"));
+        assertFalse(dm.addAccountToDatabase("karlyripper", "yolo12", "ripper@email.com"));
+
+        assertTrue(dm.addScheduleToDatabase("karlyripper", "my2025spring"));
+        assertFalse(dm.addScheduleToDatabase("karlyripper", "my2025spring"));
+
         dm.addClassToSchedule("karlyripper", "my2025spring", 0);
-        dm.addMajorOrMinor("karlyripper", "Computer Science", true);
-        dm.addMajorOrMinor("karlyripper", "Mobile Development", false);
+
+        dm.addMajorMinor("karlyripper", "Comp Sci", "");
+        String[] res = dm.getMajorMinor("karlyripper");
+        assertEquals("karlyripper", res[0]);
+        assertEquals("Comp Sci", res[1]);
+        assertEquals("Enter your area of study here", res[2]);
+
         dm.addClassAsTaken("karlyripper", 0);
     }
 
@@ -179,8 +190,7 @@ public class DatabaseManagerTest{
         dm.addAccountToDatabase("karlyripper", "yolo12", "ripper@email.com");
         dm.addScheduleToDatabase("karlyripper", "my2025spring");
         dm.addClassToSchedule("karlyripper", "my2025spring", 0);
-        dm.addMajorOrMinor("karlyripper", "Computer Science", true);
-        dm.addMajorOrMinor("karlyripper", "Mobile Development", false);
+        dm.addMajorMinor("karlyripper", "", "");
         dm.addClassAsTaken("karlyripper", 0);
 
         dm.removeAccountFromDatabase("karlyripper", "yolo12", "ripper@email.com");
@@ -190,13 +200,26 @@ public class DatabaseManagerTest{
         dm.addScheduleToDatabase("karlyripper", "my2025spring");
         dm.addScheduleToDatabase("karlyripper", "my2025fall");
         dm.addClassToSchedule("karlyripper", "my2025spring", 0);
-        dm.addMajorOrMinor("karlyripper", "Computer Science", true);
-        dm.addMajorOrMinor("karlyripper", "Mobile Development", false);
         dm.addClassAsTaken("karlyripper", 0);
 
-        dm.removeMajorOrMinor("karlyripper", "Mobile Development", false);
+        dm.addMajorMinor("karlyripper", "", "Mobile Development");
+        String[] res = dm.getMajorMinor("karlyripper");
+        assertEquals("karlyripper", res[0]);
+        assertEquals("Enter your area of study here", res[1]);
+        assertEquals("Mobile Development", res[2]);
+
+        dm.addMajorMinor("karlyripper", "Computer Science", "Mobile Development, Cybersecurity");
+        res = dm.getMajorMinor("karlyripper");
+        assertEquals("karlyripper", res[0]);
+        assertEquals("Computer Science", res[1]);
+        assertEquals("Mobile Development, Cybersecurity", res[2]);
+
         dm.removeClassAsTaken("karlyripper", 0);
+
+        //assertTrue(dm.removeClassFromSchedule("karlyripper", "my2025spring", 0));
         dm.removeClassFromSchedule("karlyripper", "my2025spring", 0);
+
+        assertTrue(dm.removeScheduleFromDatabase("karlyripper", "my2025fall"));
         dm.removeScheduleFromDatabase("karlyripper", "my2025fall");
     }
 
