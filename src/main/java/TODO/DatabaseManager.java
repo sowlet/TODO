@@ -3,6 +3,7 @@ package TODO;
 import com.google.gson.*;
 
 import java.sql.*;
+import java.util.Objects;
 
 public class DatabaseManager {
     public Connection db;
@@ -70,9 +71,9 @@ public class DatabaseManager {
 
     String create_majorsAndMinors_table = "CREATE TABLE IF NOT EXISTS majorsAndMinors (\n"
             + "username TEXT NOT NULL,\n"
-            + "mName TEXT NOT NULL,\n"
-            + "isMajor BOOLEAN NOT NULL,\n"
-            + "PRIMARY KEY (username, mName, isMajor),\n"
+            + "majors TEXT NOT NULL,\n"
+            + "minors TEXT NOT NULL,\n"
+            + "PRIMARY KEY (username, majors, minors),\n"
             + "FOREIGN KEY (username) REFERENCES accounts(username)\n)";
 
     //Custom events tables
@@ -215,17 +216,45 @@ public class DatabaseManager {
         }
     }
 
-    public void addAccountToDatabase(String username, String password, String email) {
+    public Boolean addAccountToDatabase(String username, String password, String email) {
+        String get_account = "SELECT username FROM accounts WHERE username=?";
+
+
+        try (PreparedStatement prep = db.prepareStatement(get_account)) {
+            prep.setString(1, username);
+            ResultSet result = prep.executeQuery();
+            if (result.next()) {
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error adding to the accounts table: " + e.getMessage());
+        }
+
+
         String insert_account = "INSERT INTO accounts (username, password, email) VALUES (?,?,?)";
+        String insert_m = "INSERT INTO majorsAndMinors (username, majors, minors) VALUES (?,?,?)";
 
         try (PreparedStatement prep = db.prepareStatement(insert_account)) {
             prep.setString(1, username);
             prep.setString(2, password);
             prep.setString(3, email);
             prep.executeUpdate();
+
+
+            try (PreparedStatement prepM = db.prepareStatement(insert_m)) {
+                prepM.setString(1, username);
+                prepM.setString(2, "Enter your area of study here");
+                prepM.setString(3, "Enter your area of study here");
+                prepM.executeUpdate();
+            } catch (SQLException e) {
+                System.out.println("Error adding to the majors/minors table: " + e.getMessage());
+            }
+
         } catch (SQLException e) {
             System.out.println("Error adding to the accounts table: " + e.getMessage());
         }
+
+        return true;
     }
 
     public void removeAccountFromDatabase(String username, String password, String email) {
@@ -273,7 +302,20 @@ public class DatabaseManager {
         }
     }
 
-    public void addScheduleToDatabase(String username, String name) {
+    public Boolean addScheduleToDatabase(String username, String name) {
+        String get_schedule = "SELECT scheduleName FROM schedules WHERE username=? and scheduleName=?";
+
+        try (PreparedStatement prep = db.prepareStatement(get_schedule)) {
+            prep.setString(1, username);
+            prep.setString(2, name);
+            ResultSet result = prep.executeQuery();
+            if (result.next()) {
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error adding to the schedule table: " + e.getMessage());
+        }
+
         String insert_schedule = "INSERT INTO schedules (username, scheduleName) VALUES (?,?)";
 
         try (PreparedStatement prep = db.prepareStatement(insert_schedule)) {
@@ -283,9 +325,11 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.out.println("Error adding to the schedules table: " + e.getMessage());
         }
+
+        return true;
     }
 
-    public void removeScheduleFromDatabase(String username, String name) {
+    public boolean removeScheduleFromDatabase(String username, String name) {
         String delete_schedule = "DELETE FROM schedules WHERE username=? AND scheduleName=?";
         String delete_scheduledClasses = "DELETE FROM scheduledClasses WHERE username=? AND scheduleName=?";
 
@@ -304,6 +348,8 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.out.println("Error removing from the scheduledClasses table: " + e.getMessage());
         }
+
+        return true;
     }
 
     public void addClassToSchedule(String username, String scheduleName, int ID) {
@@ -333,7 +379,7 @@ public class DatabaseManager {
     }
 
     public void addClassAsTaken(String username, int ID) {
-        String insert_classesTaken = "INSERT INTO classesTaken (username, id, hasRatedClass) VALUES (?,?,?)";
+        String insert_classesTaken = "INSERT OR IGNORE INTO classesTaken (username, id, hasRatedClass) VALUES (?,?,?)";
 
         try (PreparedStatement prep = db.prepareStatement(insert_classesTaken)) {
             prep.setString(1, username);
@@ -357,31 +403,75 @@ public class DatabaseManager {
         }
     }
 
-    public void addMajorOrMinor(String username, String mName, boolean isMajor) {
-        String insert_majorsAndMinors = "INSERT INTO majorsAndMinors (username, mName, isMajor) VALUES (?,?,?)";
+    public Boolean addMajorMinor(String username, String majors, String minors) {
+
+        if (Objects.equals(majors, "") || Objects.equals(majors, "Enter your area of study here")) {
+            majors = "Enter your area of study here";
+        }
+
+        if (Objects.equals(minors, "") || Objects.equals(minors, "Enter your area of study here")) {
+            minors = "Enter your area of study here";
+        }
+
+        removeMajorMinor(username);
+        String insert_majorsAndMinors = "INSERT INTO majorsAndMinors (username, majors, minors) VALUES (?,?,?)";
 
         try (PreparedStatement prep = db.prepareStatement(insert_majorsAndMinors)) {
             prep.setString(1, username);
-            prep.setString(2, mName);
-            prep.setBoolean(3, isMajor);
+            prep.setString(2, majors);
+            prep.setString(3, minors);
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding to the majorsAndMinors table: " + e.getMessage());
         }
+
+        return true;
     }
 
-    public void removeMajorOrMinor(String username, String mName, boolean isMajor) {
-        String delete_majorsAndMinors = "DELETE FROM majorsAndMinors WHERE username=? AND mName=? AND isMajor=?";
+    public String[] getMajorMinor(String username) {
+        String get_major = "SELECT majors,minors FROM majorsAndMinors WHERE username=?";
+        String[] allInfo = new String[3];
+        allInfo[0] = username;
 
-        try (PreparedStatement prep = db.prepareStatement(delete_majorsAndMinors)) {
+
+        try (PreparedStatement prep = db.prepareStatement(get_major)) {
             prep.setString(1, username);
-            prep.setString(2, mName);
-            prep.setBoolean(3, isMajor);
+            ResultSet result = prep.executeQuery();
+            allInfo[1] = result.getString("majors");
+            allInfo[2] = result.getString("minors");
+        } catch (SQLException e) {
+            System.out.println("Error getting from the majorsAndMinors table: " + e.getMessage());
+        }
+
+        return allInfo;
+    }
+
+    private void removeMajorMinor(String username) {
+        String delete_classesTaken = "DELETE FROM majorsAndMinors WHERE username=?";
+
+        try (PreparedStatement prep = db.prepareStatement(delete_classesTaken)) {
+            prep.setString(1, username);
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error removing from the majorsAndMinors table: " + e.getMessage());
         }
     }
+
+
+//    public Boolean removeMajorOrMinor(String username, String mName, boolean isMajor) {
+//        String delete_majorsAndMinors = "DELETE FROM majorsAndMinors WHERE username=? AND mName=? AND isMajor=?";
+//
+//        try (PreparedStatement prep = db.prepareStatement(delete_majorsAndMinors)) {
+//            prep.setString(1, username);
+//            prep.setString(2, mName);
+//            prep.setBoolean(3, isMajor);
+//            prep.executeUpdate();
+//        } catch (SQLException e) {
+//            System.out.println("Error removing from the majorsAndMinors table: " + e.getMessage());
+//        }
+//
+//        return true;
+//    }
 
     //search method
     public JsonArray search(String name){
@@ -549,6 +639,69 @@ public class DatabaseManager {
             System.out.println("Error removing from the customEventsTimes table: " + e.getMessage());
         }
     }
+
+    public String validAccount(String username, String password) {
+        String get_account = "SELECT username FROM accounts WHERE username=? AND password=?";
+
+
+        try (PreparedStatement prep = db.prepareStatement(get_account)) {
+            prep.setString(1, username);
+            prep.setString(2, password);
+            ResultSet result = prep.executeQuery();
+            if (result.next()) {
+                return result.getString("username");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error adding to the accounts table: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    public ResultSet getSchedules(String username) {
+        ResultSet result = null;
+        String get_schedules = "SELECT scheduleName FROM schedules WHERE username=?";
+
+        try (PreparedStatement prep = db.prepareStatement(get_schedules)) {
+            prep.setString(1, username);
+            result = prep.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error adding to the accounts table: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+//    public ResultSet getClassesInSchedule(String username, String scheduleName) {
+//        ResultSet result = null;
+//        String get_classes = "SELECT id FROM scheduledClasses WHERE username=? AND scheduleName=?";
+//
+//        try (PreparedStatement prep = db.prepareStatement(get_classes)) {
+//            prep.setString(1, username);
+//            prep.setString(2, scheduleName);
+//            ResultSet res = prep.executeQuery();
+//
+//            while(res.next()){
+//                int classID = res.getInt("id");
+//
+//                JsonObject classObj = new JsonObject();
+//                for(int i = 2; i <= numClassCols; i++){
+//                    colName = classMD.getColumnName(i);
+//                    value = res.getObject(i);
+//                    classObj.addProperty(colName, value != null ? value.toString() : null);
+//                }
+//            }
+//        } catch (SQLException e) {
+//            System.out.println("Error selecting from the scheduledClasses table: " + e.getMessage());
+//        }
+//
+//
+//
+//
+//        return result;
+//    }
+
+
 
 
 
