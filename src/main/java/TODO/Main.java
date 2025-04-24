@@ -22,6 +22,7 @@ public class Main {
     public static DatabaseManager dm = null;
     public static SearchController sc = null;
     public static AccountController ac = null;
+    public static ScheduleController scc = null;
 
     public static void main(String[] args) throws FileNotFoundException {
         loadClassesFromJson("src/main/java/TODO/data_wolfe.json", classes);
@@ -33,6 +34,7 @@ public class Main {
             dm = new DatabaseManager();
             sc = new SearchController(dm);
             ac = new AccountController(dm);
+            scc = new ScheduleController(dm);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -64,6 +66,7 @@ public class Main {
 
         sc.registerRoutes(app);
         ac.registerRoutes(app);
+        scc.registerRoutes(app);
 
         //run();
 
