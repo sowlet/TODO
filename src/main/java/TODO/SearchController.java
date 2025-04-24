@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
+import java.util.ArrayList;
+
 public class SearchController {
     private DatabaseManager dm = null;
 
@@ -22,7 +24,6 @@ public class SearchController {
         for (int i = 0; i < res.size(); i++){
             test[i] = res.get(i).getAsJsonObject().get("name").getAsString();
         }
-
         con.json(test);
     }
 
