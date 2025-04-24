@@ -593,7 +593,7 @@ public class DatabaseManager {
         }
     }
 
-    public void addCustomEvent(String username, String scheduleName, String eventName, String location, String day, String startTime, String endTime) {
+    public int addCustomEvent(String username, String scheduleName, String eventName, String location, String day, String startTime, String endTime) {
         String insert_customEvent = "INSERT INTO customEvents (username, scheduleName, eventName, location) VALUES (?,?,?,?)";
 
         try (PreparedStatement prep = db.prepareStatement(insert_customEvent)) {
@@ -604,6 +604,7 @@ public class DatabaseManager {
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding to the customEvents table: " + e.getMessage());
+            return -1;
         }
 
         String insert_customEventTimes = "INSERT INTO customEventsTimes (day, start_time, end_time) VALUES (?,?,?)";
@@ -614,13 +615,23 @@ public class DatabaseManager {
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding to the customEventsTimes table: " + e.getMessage());
+            return -1;
+        }
+
+        String findId = "SELECT * FROM customEvents ORDER BY id DESC LIMIT 1";
+        try (PreparedStatement prep = db.prepareStatement(findId)) {
+            ResultSet result = prep.executeQuery();
+            return result.getInt("id");
+        } catch (SQLException e) {
+            System.out.println("Error finding id from the customEventsTimes table: " + e.getMessage());
+            return -1;
         }
     }
 
     /*
     @param int id the id of the custom event to be removed
      */
-    public void removeCustomEvent(int id) {
+    public boolean removeCustomEvent(int id) {
         String delete_customEvent = "DELETE FROM customEvents WHERE id=?";
         String delete_customEventTime = "DELETE FROM customEventsTimes WHERE id=?";
 
@@ -629,6 +640,7 @@ public class DatabaseManager {
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error removing from the customEvents table: " + e.getMessage());
+            return false;
         }
 
 
@@ -637,7 +649,9 @@ public class DatabaseManager {
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error removing from the customEventsTimes table: " + e.getMessage());
+            return false;
         }
+        return true;
     }
 
     public String validAccount(String username, String password) {
