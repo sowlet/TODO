@@ -3,6 +3,9 @@ package TODO;
 import com.google.gson.*;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class DatabaseManager {
@@ -566,6 +569,94 @@ public class DatabaseManager {
         return searchResults;
     }
 
+
+    public JsonArray getSchedules(String username){
+        String search_schedules = "SELECT scheduleName FROM schedules WHERE username=?";
+//        String search_scheduledClasses = "SELECT id FROM scheduledClasses WHERE username=?";
+        String search_classes = "SELECT classes.id,classes.name,classes.subject,classes.number,classes.section FROM classes JOIN scheduledClasses ON classes.id = scheduledClasses.id WHERE scheduledClasses.username=? AND scheduledClasses.scheduleName=?";
+        String search_classTimes = "SELECT day,start_time,end_time FROM classTimes WHERE id=?";
+
+        String nameS = "";
+
+        JsonArray scheduleResults = new JsonArray();
+        String colName = "";
+        Object value = null;
+
+        try(PreparedStatement schedPrep = db.prepareStatement(search_schedules)){
+            schedPrep.setString(1, username);
+            ResultSet schedResults = schedPrep.executeQuery();
+
+            ResultSetMetaData schedMD= schedResults.getMetaData();
+            int numSchedCols = schedMD.getColumnCount();
+
+            while(schedResults.next()){
+                nameS = schedResults.getString("scheduleName");
+                JsonArray classes = new JsonArray();
+                JsonArray times = new JsonArray();
+
+                JsonObject schedObj = new JsonObject();
+                schedObj.addProperty("name", nameS);
+
+                //get the faculty of the class
+                try(PreparedStatement classPrep = db.prepareStatement(search_classes)){
+                    classPrep.setString(1, username);
+                    classPrep.setString(2, nameS);
+                    ResultSet classResults = classPrep.executeQuery();
+
+                    ResultSetMetaData classMD= classResults.getMetaData();
+                    int numClassCols = classMD.getColumnCount();
+
+                    while(classResults.next()){
+                        int classID = classResults.getInt("id");
+
+                        JsonObject classObj = new JsonObject();
+                        for(int i = 1; i <= numClassCols; i++){
+                            colName = classMD.getColumnName(i);
+                            value = classResults.getObject(i);
+                            classObj.addProperty(colName, value != null ? value.toString() : null);
+                        }
+
+                        //get the classTimes of the class
+                        try(PreparedStatement timesPrep = db.prepareStatement(search_classTimes)){
+                            timesPrep.setInt(1, classID);
+                            ResultSet timeResults = timesPrep.executeQuery();
+
+                            ResultSetMetaData timeMD= timeResults.getMetaData();
+                            int numTimeCols = timeMD.getColumnCount();
+
+                            while(timeResults.next()){
+                                JsonObject classTimeObj = new JsonObject();
+                                for(int i = 2; i <= numTimeCols; i++){
+                                    colName = timeMD.getColumnName(i);
+                                    value = timeResults.getObject(i);
+                                    classTimeObj.addProperty(colName, value != null ? value.toString() : null);
+                                }
+                                times.add(classTimeObj);
+                            }
+                            classObj.add("classTimes", times);
+
+                        }catch (SQLException e){
+                            System.out.println("Error searching the classTimes table: " + e.getMessage());
+                        }
+
+                        classes.add(classObj);
+                    }
+
+                    schedObj.add("classes", classes);
+
+                }catch (SQLException e){
+                    System.out.println("Error searching the classes table: " + e.getMessage());
+                }
+
+                scheduleResults.add(schedObj);
+            }
+        }catch (SQLException e){
+            System.out.println("Error searching the schedules table: " + e.getMessage());
+        }
+
+        return scheduleResults;
+    }
+
     public void printClassInfo(){
         String select_all_classes = "SELECT * FROM classes";
         //String select_all_classTimes = "SELECT * FROM classTimes";
@@ -654,7 +745,7 @@ public class DatabaseManager {
         return true;
     }
 
-    public String validAccount(String username, String password) {
+    public Boolean validAccount(String username, String password) {
         String get_account = "SELECT username FROM accounts WHERE username=? AND password=?";
 
 
@@ -663,31 +754,84 @@ public class DatabaseManager {
             prep.setString(2, password);
             ResultSet result = prep.executeQuery();
             if (result.next()) {
-                return result.getString("username");
+                return true;
             }
         } catch (SQLException e) {
             System.out.println("Error adding to the accounts table: " + e.getMessage());
         }
 
-        return null;
+        return false;
     }
 
-    public ResultSet getSchedules(String username) {
-        ResultSet result = null;
-        String get_schedules = "SELECT scheduleName FROM schedules WHERE username=?";
-
-        try (PreparedStatement prep = db.prepareStatement(get_schedules)) {
-            prep.setString(1, username);
-            result = prep.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error adding to the accounts table: " + e.getMessage());
-        }
-
-        return result;
-    }
-
-//    public ResultSet getClassesInSchedule(String username, String scheduleName) {
+//    public ResultSet getSchedules(String username) {
+//        String get_schedules = "SELECT * FROM schedules WHERE username=?";
 //        ResultSet result = null;
+//
+//        try (PreparedStatement prep = db.prepareStatement(get_schedules)) {
+//            prep.setString(1, username);
+//            result = prep.executeQuery();
+//            while(result.next()){
+//                System.out.println(result.getString("scheduleName") + result.getString("scheduleName"));
+//            }
+//        } catch (SQLException e) {
+//            System.out.println("Error getting from the schedules table: " + e.getMessage());
+//        }
+//
+//            //String[] contents = null;
+//
+//            ResultSetMetaData schedsMD = result.getMetaData();
+//            int numSchedCols = schedsMD.getColumnCount();
+//
+//            while(result.next()){
+//                String schedName = result.getString("scheduleName");
+//                ArrayList<String[]> singleSchedule = new ArrayList<>();
+//
+//                String get_scheduledClassed= "SELECT name,subject,number,section FROM scheduledClasses WHERE username=? AND scheduleName=?";
+//
+//                String get_classes = "SELECT name,subject,number,section FROM scheduledClasses WHERE username=? AND scheduleName=?";
+//
+//                try (PreparedStatement prepC = db.prepareStatement(get_schedules)) {
+//                    prepC.setString(1, username);
+//                    prepC.setString(2, schedName);
+//                    ResultSet classes = prepC.executeQuery();
+//
+//                    String get_classes = "SELECT name,subject,number,section FROM scheduledClasses WHERE username=? AND scheduleName=?";
+//
+//                    try (PreparedStatement prepC = db.prepareStatement(get_schedules)) {
+//                        prepC.setString(1, username);
+//                        prepC.setString(2, schedName);
+//                        ResultSet classes = prepC.executeQuery();
+//                    } catch (SQLException e) {
+//                        System.out.println("Error adding to the accounts table: " + e.getMessage());
+//                    }
+//
+//                    ResultSetMetaData classesMD = classes.getMetaData();
+//                  int numClassCols = classesMD.getColumnCount();
+//
+//                   String[] contents = new String[numClass];
+//                for(int i = 2; i <= numSchedCols; i++){
+//                    colName = resultMD.getColumnName(i);
+//                    value = classResults.getObject(i);
+//                    classObj.addProperty(colName, value != null ? value.toString() : null);
+//                }
+//
+//
+//                } catch (SQLException e) {
+//                    System.out.println("Error getting from the scheduled classes table: " + e.getMessage());
+//                }
+//
+//                //allSchedules.put(schedName, singleSchedule);
+//            }
+//        } catch (SQLException e) {
+//            System.out.println("Error getting from the schedules table: " + e.getMessage());
+//        }
+//
+//        return allSchedules;
+//    }
+
+//    public ResultSet getClassesInfo(String username, String scheduleName) {
+//        ResultSet result = null;
+//        ArrayList<String[]> classInfo = new ArrayList<>();
 //        String get_classes = "SELECT id FROM scheduledClasses WHERE username=? AND scheduleName=?";
 //
 //        try (PreparedStatement prep = db.prepareStatement(get_classes)) {
@@ -697,21 +841,10 @@ public class DatabaseManager {
 //
 //            while(res.next()){
 //                int classID = res.getInt("id");
-//
-//                JsonObject classObj = new JsonObject();
-//                for(int i = 2; i <= numClassCols; i++){
-//                    colName = classMD.getColumnName(i);
-//                    value = res.getObject(i);
-//                    classObj.addProperty(colName, value != null ? value.toString() : null);
-//                }
 //            }
 //        } catch (SQLException e) {
 //            System.out.println("Error selecting from the scheduledClasses table: " + e.getMessage());
 //        }
-//
-//
-//
-//
 //        return result;
 //    }
 
