@@ -30,7 +30,7 @@ public class AccountController {
     private void validateLogin(Context con){
         String username = con.queryParam("username");
         String password = con.queryParam("password");
-        String userResult = dm.validAccount(username, password);
+        Boolean userResult = dm.validAccount(username, password);
 
         con.json(userResult);
     }

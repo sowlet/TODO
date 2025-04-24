@@ -640,7 +640,7 @@ public class DatabaseManager {
         }
     }
 
-    public String validAccount(String username, String password) {
+    public Boolean validAccount(String username, String password) {
         String get_account = "SELECT username FROM accounts WHERE username=? AND password=?";
 
 
@@ -649,13 +649,13 @@ public class DatabaseManager {
             prep.setString(2, password);
             ResultSet result = prep.executeQuery();
             if (result.next()) {
-                return result.getString("username");
+                return true;
             }
         } catch (SQLException e) {
             System.out.println("Error adding to the accounts table: " + e.getMessage());
         }
 
-        return null;
+        return false;
     }
 
     public ResultSet getSchedules(String username) {
