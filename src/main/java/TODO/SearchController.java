@@ -33,15 +33,23 @@ public class SearchController {
             return;
         }
 
-        // Create a list to store the maps
-        Map<String, Object> map = new HashMap<>();
+        ArrayList<Map<String, Object>> maps = new ArrayList<>();
+        // Create a list to store the map
         // Iterate through the JsonArray
 
         for (int i = 0; i < res.size(); i++) {
+            Map<String, Object> map = new HashMap<>();
             JsonArray classTimes = res.get(i).getAsJsonObject().get("classTimes").getAsJsonArray();
             String days = "";
-            String start_time = classTimes.get(0).getAsJsonObject().get("startTime").getAsString();
-            String end_time = classTimes.get(0).getAsJsonObject().get("endTime").getAsString();
+            String start_time = "";
+            String end_time = "";
+            if(classTimes.size() != 0) {
+                 start_time = classTimes.get(0).getAsJsonObject().get("start_time").getAsString();
+                 end_time = classTimes.get(0).getAsJsonObject().get("end_time").getAsString();
+            } else {
+                 start_time = "No Time Available";
+                 end_time = "No Time Available";
+            }
 
             map.put("id", res.get(i).getAsJsonObject().get("id").getAsInt());
             map.put("name", res.get(i).getAsJsonObject().get("name").getAsString());
@@ -53,12 +61,15 @@ public class SearchController {
 
             for (JsonElement time : classTimes) {
                 JsonObject timeObj = time.getAsJsonObject();
-                days += timeObj.get("days").getAsString();
+                if (timeObj.get("day") != null) {
+                    days += timeObj.get("day").getAsString();
+                }
             }
 
             map.put("days", days);
             map.put("startTime", start_time);
             map.put("endTime", end_time);
+            maps.add(map);
         }
 
 
@@ -85,7 +96,7 @@ public class SearchController {
 //            }
 //        }
 
-        con.json(map);
+        con.json(maps);
     }
 
 }
