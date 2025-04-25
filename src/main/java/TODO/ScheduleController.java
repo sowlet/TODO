@@ -66,6 +66,7 @@ public class ScheduleController {
             formattedSchedules.add(scheduleMap);
         }
 
+        
         con.json(formattedSchedules);
     }
 
