@@ -39,12 +39,12 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        //add all classes to the database
-        dm.dropAllTables();
-        dm.createAllTables();
-        for (int i = 0; i < classes.size(); i++){
-            dm.addClassToDatabase(classes.get(i), i);
-        }
+       // add all classes to the database
+//        dm.dropAllTables();
+//        dm.createAllTables();
+//        for (int i = 0; i < classes.size(); i++){
+//            dm.addClassToDatabase(classes.get(i), i);
+//        }
 
 //        search = new Search();
 
