@@ -477,8 +477,8 @@ public class DatabaseManager {
 //    }
 
     //search method
-    public JsonArray search(String name){
-        String search_classes = "SELECT id,name,subject,number,section,semester FROM classes WHERE name LIKE ?";
+    public JsonArray search(String name){ //, String
+        String search_classes = "SELECT id,name,subject,number,section,semester FROM classes WHERE name LIKE ?"; //"SELECT id,name,subject,number,section,semester FROM classes WHERE name LIKE ? AND subject LIKE ?";
         String search_classTimes = "SELECT * FROM classTimes WHERE id=?";
         String search_faculty = "SELECT * FROM faculty WHERE id=?";
         int classID = 0;
@@ -515,7 +515,7 @@ public class DatabaseManager {
 
                 //get the classTimes of the class
                 try(PreparedStatement timesPrep = db.prepareStatement(search_classTimes)){
-                    timesPrep.setString(1, "%" + name + "%");
+                    timesPrep.setInt(1, classID);
                     ResultSet timeResults = timesPrep.executeQuery();
 
                     ResultSetMetaData timeMD= timeResults.getMetaData();
@@ -539,7 +539,7 @@ public class DatabaseManager {
 
                 //get the faculty of the class
                 try(PreparedStatement facPrep = db.prepareStatement(search_faculty)){
-                    facPrep.setString(1, "%" + name + "%");
+                    facPrep.setInt(1, classID);
                     ResultSet facResults = facPrep.executeQuery();
 
                     ResultSetMetaData facMD= facResults.getMetaData();
