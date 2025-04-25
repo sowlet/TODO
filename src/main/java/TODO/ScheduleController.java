@@ -1,12 +1,15 @@
 package TODO;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.json.JsonMapper;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ScheduleController {
@@ -25,8 +28,45 @@ public class ScheduleController {
     private void getAllSchedules(Context con){
         String username = con.queryParam("username");
         JsonArray schedules = dm.getSchedules(username);
+        for(JsonElement schedule: schedules){
+            System.out.println(schedule.toString());
+        }
 
-        con.json(schedules);
+        if (schedules == null || schedules.size() == 0) {
+            con.status(404).result("No schedules found for the user.");
+            if(schedules != null){
+                System.out.println(schedules.size());
+            }
+            return;
+        }
+        ArrayList<Map<String, Object>> formattedSchedules = new ArrayList<>();
+        for (JsonElement schedule : schedules) {
+            // Extract schedule name
+            String name = schedule.getAsJsonObject().get("name").getAsString();
+
+            // Extract classes
+            ArrayList<Map<String, Object>> classes = new ArrayList<>();
+            if (schedule.getAsJsonObject().has("classes")) {
+                JsonArray classArray = schedule.getAsJsonObject().get("classes").getAsJsonArray();
+                for (JsonElement classElement : classArray) {
+                    Map<String, Object> classMap = new HashMap<>();
+                    JsonObject classObj = classElement.getAsJsonObject();
+                    for (Map.Entry<String, JsonElement> entry : classObj.entrySet()) {
+                        classMap.put(entry.getKey(), entry.getValue().getAsString());
+                    }
+                    classes.add(classMap);
+                }
+            }
+
+            // Create a schedule map
+            Map<String, Object> scheduleMap = new HashMap<>();
+            scheduleMap.put("name", name);
+            scheduleMap.put("classes", classes);
+
+            formattedSchedules.add(scheduleMap);
+        }
+
+        con.json(formattedSchedules);
     }
 
     private void addSchedule(Context con){
@@ -45,5 +85,9 @@ public class ScheduleController {
         con.json(deleteScheduleResult);
     }
 
+    private void updateSchedule(Context con){
+        String username = con.queryParam("username");
+        String scheduleName = con.queryParam("name");
+    }
 
 }
