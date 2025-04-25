@@ -478,14 +478,12 @@ public class DatabaseManager {
 
     //search method
     public JsonArray search(String name){
-        String search_classes = "SELECT * FROM classes WHERE name LIKE ?";
+        String search_classes = "SELECT id,name,subject,number,section,semester FROM classes WHERE name LIKE ?";
         String search_classTimes = "SELECT * FROM classTimes WHERE id=?";
         String search_faculty = "SELECT * FROM faculty WHERE id=?";
         int classID = 0;
 
         JsonArray searchResults = new JsonArray();
-        JsonArray times = new JsonArray();
-        JsonArray facs = new JsonArray();
         String colName = "";
         Object value = null;
 
@@ -503,6 +501,8 @@ public class DatabaseManager {
 
             while(classResults.next()){
                 classID = classResults.getInt("id");
+                JsonArray times = new JsonArray();
+                JsonArray facs = new JsonArray();
 
                 JsonObject classObj = new JsonObject();
                 for(int i = 2; i <= numClassCols; i++){
@@ -748,98 +748,6 @@ public class DatabaseManager {
 
         return false;
     }
-
-//    public ResultSet getSchedules(String username) {
-//        String get_schedules = "SELECT * FROM schedules WHERE username=?";
-//        ResultSet result = null;
-//
-//        try (PreparedStatement prep = db.prepareStatement(get_schedules)) {
-//            prep.setString(1, username);
-//            result = prep.executeQuery();
-//            while(result.next()){
-//                System.out.println(result.getString("scheduleName") + result.getString("scheduleName"));
-//            }
-//        } catch (SQLException e) {
-//            System.out.println("Error getting from the schedules table: " + e.getMessage());
-//        }
-//
-//            //String[] contents = null;
-//
-//            ResultSetMetaData schedsMD = result.getMetaData();
-//            int numSchedCols = schedsMD.getColumnCount();
-//
-//            while(result.next()){
-//                String schedName = result.getString("scheduleName");
-//                ArrayList<String[]> singleSchedule = new ArrayList<>();
-//
-//                String get_scheduledClassed= "SELECT name,subject,number,section FROM scheduledClasses WHERE username=? AND scheduleName=?";
-//
-//                String get_classes = "SELECT name,subject,number,section FROM scheduledClasses WHERE username=? AND scheduleName=?";
-//
-//                try (PreparedStatement prepC = db.prepareStatement(get_schedules)) {
-//                    prepC.setString(1, username);
-//                    prepC.setString(2, schedName);
-//                    ResultSet classes = prepC.executeQuery();
-//
-//                    String get_classes = "SELECT name,subject,number,section FROM scheduledClasses WHERE username=? AND scheduleName=?";
-//
-//                    try (PreparedStatement prepC = db.prepareStatement(get_schedules)) {
-//                        prepC.setString(1, username);
-//                        prepC.setString(2, schedName);
-//                        ResultSet classes = prepC.executeQuery();
-//                    } catch (SQLException e) {
-//                        System.out.println("Error adding to the accounts table: " + e.getMessage());
-//                    }
-//
-//                    ResultSetMetaData classesMD = classes.getMetaData();
-//                  int numClassCols = classesMD.getColumnCount();
-//
-//                   String[] contents = new String[numClass];
-//                for(int i = 2; i <= numSchedCols; i++){
-//                    colName = resultMD.getColumnName(i);
-//                    value = classResults.getObject(i);
-//                    classObj.addProperty(colName, value != null ? value.toString() : null);
-//                }
-//
-//
-//                } catch (SQLException e) {
-//                    System.out.println("Error getting from the scheduled classes table: " + e.getMessage());
-//                }
-//
-//                //allSchedules.put(schedName, singleSchedule);
-//            }
-//        } catch (SQLException e) {
-//            System.out.println("Error getting from the schedules table: " + e.getMessage());
-//        }
-//
-//        return allSchedules;
-//    }
-
-//    public ResultSet getClassesInfo(String username, String scheduleName) {
-//        ResultSet result = null;
-//        ArrayList<String[]> classInfo = new ArrayList<>();
-//        String get_classes = "SELECT id FROM scheduledClasses WHERE username=? AND scheduleName=?";
-//
-//        try (PreparedStatement prep = db.prepareStatement(get_classes)) {
-//            prep.setString(1, username);
-//            prep.setString(2, scheduleName);
-//            ResultSet res = prep.executeQuery();
-//
-//            while(res.next()){
-//                int classID = res.getInt("id");
-//            }
-//        } catch (SQLException e) {
-//            System.out.println("Error selecting from the scheduledClasses table: " + e.getMessage());
-//        }
-//        return result;
-//    }
-
-
-
-
-
-
-
 
 
     //methods used to create and close the connection to the database
