@@ -31,25 +31,33 @@ public class Main {
         loadAccountsFromJson("src/main/java/TODO/data_accounts.json", accounts);
         System.out.println(getSubjects());
 
-        //create new database manager object
-        try{
-            dm = new DatabaseManager();
-            sc = new SearchController(dm);
-            ac = new AccountController(dm);
-            scc = new ScheduleController(dm);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-       // add all classes to the database
-//        dm.dropAllTables();
-//        dm.createAllTables();
-//        for (int i = 0; i < classes.size(); i++){
-//            dm.addClassToDatabase(classes.get(i), i);
+//        //create new database manager object
+//        try{
+//            dm = new DatabaseManager();
+//            sc = new SearchController(dm);
+//            ac = new AccountController(dm);
+//            scc = new ScheduleController(dm);
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
 //        }
-
-//        search = new Search();
-
+//
+//       // add all classes to the database
+////        dm.dropAllTables();
+////        dm.createAllTables();
+////        for (int i = 0; i < classes.size(); i++){
+////            dm.addClassToDatabase(classes.get(i), i);
+////        }
+//
+////        search = new Search();
+//
+////        Javalin app = Javalin.create(config -> {
+////            config.bundledPlugins.enableCors(cors -> {
+////                cors.addRule(it -> {
+////                    it.allowHost("http://localhost:4200");
+////                });
+////            });
+////        }).start(7070);
+//
 //        Javalin app = Javalin.create(config -> {
 //            config.bundledPlugins.enableCors(cors -> {
 //                cors.addRule(it -> {
@@ -57,20 +65,12 @@ public class Main {
 //                });
 //            });
 //        }).start(7070);
+//
+//        sc.registerRoutes(app);
+//        ac.registerRoutes(app);
+//        scc.registerRoutes(app);
 
-        Javalin app = Javalin.create(config -> {
-            config.bundledPlugins.enableCors(cors -> {
-                cors.addRule(it -> {
-                    it.allowHost("http://localhost:4200");
-                });
-            });
-        }).start(7070);
-
-        sc.registerRoutes(app);
-        ac.registerRoutes(app);
-        scc.registerRoutes(app);
-
-        //run();
+        run();
 
         System.out.println("To exit the application: type 'e'");
         Scanner scan = new Scanner(System.in);
@@ -549,7 +549,7 @@ public class Main {
             String input;
             label:
             while (true) {
-                System.out.println("Editing schedule: " + currentlyEditing.getName() +  "\n" + currentlyEditing.getClasses().toString() + "\nTo add a class: type 'a'\nTo remove a class: type 'r'\nTo add a custom event: type 'c'\nTo remove a custom event: type 'e'\nTo go back: type 'b'");
+                System.out.println("Editing schedule: " + currentlyEditing.getName() +  "\n" + currentlyEditing.getClasses().toString() + currentlyEditing.getCustomEvents().toString() + "\nTo add a class: type 'a'\nTo remove a class: type 'r'\nTo add a custom event: type 'c'\nTo remove a custom event: type 'e'\nTo go back: type 'b'");
                 input = scan.nextLine();
 
                 switch (input) {
