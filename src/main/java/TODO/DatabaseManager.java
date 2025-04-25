@@ -505,7 +505,7 @@ public class DatabaseManager {
                 JsonArray facs = new JsonArray();
 
                 JsonObject classObj = new JsonObject();
-                for(int i = 2; i <= numClassCols; i++){
+                for(int i = 1; i <= numClassCols; i++){
                     colName = classMD.getColumnName(i);
                     value = classResults.getObject(i);
                     classObj.addProperty(colName, value != null ? value.toString() : null);
