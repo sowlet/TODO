@@ -91,9 +91,10 @@ public class ScheduleController {
     private void updateSchedule(Context con) {
         String username = con.queryParam("username");
         String scheduleName = con.queryParam("name");
-        int[] classes = con.bodyAsClass(int[].class); // Assuming the array of class IDs is sent in the request body
+        JsonObject body = con.bodyAsClass(JsonObject.class); // Get body as JsonObject
+        JsonArray classesArray = body.getAsJsonArray("classes"); // Extract classes array
 
-        if (username == null || scheduleName == null || classes == null) {
+        if (username == null || scheduleName == null || classesArray == null) {
             con.status(400).result("Invalid input. Username, schedule name, and classes are required.");
             return;
         }
@@ -113,7 +114,8 @@ public class ScheduleController {
             }
 
             // Add new classes to the schedule
-            for (int classID : classes) {
+            for (JsonElement classElement : classesArray) {
+                int classID = classElement.getAsInt();
                 dm.addClassToSchedule(username, scheduleName, classID);
             }
 
