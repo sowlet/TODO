@@ -549,7 +549,7 @@ public class Main {
             String input;
             label:
             while (true) {
-                System.out.println("Editing schedule: " + currentlyEditing.getName() +  "\n" + currentlyEditing.getClasses().toString() + currentlyEditing.getCustomEvents().toString() + "\nTo add a class: type 'a'\nTo remove a class: type 'r'\nTo add a custom event: type 'c'\nTo remove a custom event: type 'e'\nTo go back: type 'b'");
+                System.out.println("Editing schedule: " + currentlyEditing.getName() +  "\n" + currentlyEditing.getClasses().toString() + "\n" + currentlyEditing.getCustomEvents().toString() + "\nTo add a class: type 'a'\nTo remove a class: type 'r'\nTo add a custom event: type 'c'\nTo remove a custom event: type 'e'\nTo go back: type 'b'");
                 input = scan.nextLine();
 
                 switch (input) {

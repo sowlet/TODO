@@ -28,6 +28,14 @@ public class Schedule {
         return customEvents;
     }
 
+    public String getCustomEventsString() {
+        String ce = "";
+        for (CustomEvents events : customEvents) {
+             ce = ce + "\n" + events.toString();
+        }
+        return ce;
+    }
+
     public String getName() {
         return name;
     }

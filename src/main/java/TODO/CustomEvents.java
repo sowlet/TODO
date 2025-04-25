@@ -132,4 +132,10 @@ public class CustomEvents {
 
         return conflict;
     }
+
+    @Override
+    public String toString() {
+        String ce = "Custom event: " + name + "\nLocation: " + location + "\nDay: " + times[0].getDay() + "\nStart time: " + times[0].getStartTime() + "\nEnd time: " + times[0].getEndTime();
+            return ce;
+    }
 }
