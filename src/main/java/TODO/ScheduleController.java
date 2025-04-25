@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 public class ScheduleController {
     private DatabaseManager dm = null;
@@ -23,6 +24,7 @@ public class ScheduleController {
         app.get("/schedule", this::getAllSchedules);
         app.post("/schedule", this::addSchedule);
         app.delete("/schedule", this::deleteSchedule);
+        app.put("/schedule", this::updateSchedule);
     }
 
     private void getAllSchedules(Context con){
@@ -66,7 +68,7 @@ public class ScheduleController {
             formattedSchedules.add(scheduleMap);
         }
 
-        
+
         con.json(formattedSchedules);
     }
 
@@ -86,9 +88,39 @@ public class ScheduleController {
         con.json(deleteScheduleResult);
     }
 
-    private void updateSchedule(Context con){
+    private void updateSchedule(Context con) {
         String username = con.queryParam("username");
         String scheduleName = con.queryParam("name");
+        int[] classes = con.bodyAsClass(int[].class); // Assuming the array of class IDs is sent in the request body
+
+        if (username == null || scheduleName == null || classes == null) {
+            con.status(400).result("Invalid input. Username, schedule name, and classes are required.");
+            return;
+        }
+
+        try {
+            // Remove all existing classes from the schedule
+            JsonArray schedules = dm.getSchedules(username);
+            JsonArray existingClasses = StreamSupport.stream(schedules.spliterator(), false)
+                    .filter(schedule -> schedule.isJsonObject() && schedule.getAsJsonObject().get("name").getAsString().equals(scheduleName))
+                    .findFirst()
+                    .map(schedule -> schedule.getAsJsonObject().get("classes").getAsJsonArray())
+                    .orElse(new JsonArray());
+
+            for (JsonElement classElement : existingClasses) {
+                int classID = classElement.getAsJsonObject().get("id").getAsInt();
+                dm.removeClassFromSchedule(username, scheduleName, classID);
+            }
+
+            // Add new classes to the schedule
+            for (int classID : classes) {
+                dm.addClassToSchedule(username, scheduleName, classID);
+            }
+
+            con.status(200).result("Schedule updated successfully.");
+        } catch (Exception e) {
+            con.status(500).result("An error occurred while updating the schedule: " + e.getMessage());
+        }
     }
 
 }
