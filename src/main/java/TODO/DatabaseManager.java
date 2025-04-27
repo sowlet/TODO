@@ -649,6 +649,7 @@ public class DatabaseManager {
                 }
 
                 scheduleResults.add(schedObj);
+
             }
         }catch (SQLException e){
             System.out.println("Error searching the schedules table: " + e.getMessage());

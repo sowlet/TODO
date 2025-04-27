@@ -31,33 +31,25 @@ public class Main {
         loadAccountsFromJson("src/main/java/TODO/data_accounts.json", accounts);
         System.out.println(getSubjects());
 
-//        //create new database manager object
-//        try{
-//            dm = new DatabaseManager();
-//            sc = new SearchController(dm);
-//            ac = new AccountController(dm);
-//            scc = new ScheduleController(dm);
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
+        //create new database manager object
+        try{
+            dm = new DatabaseManager();
+            sc = new SearchController(dm);
+            ac = new AccountController(dm);
+            scc = new ScheduleController(dm);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+       // add all classes to the database
+//        dm.dropAllTables();
+//        dm.createAllTables();
+//        for (int i = 0; i < classes.size(); i++){
+//            dm.addClassToDatabase(classes.get(i), i);
 //        }
-//
-//       // add all classes to the database
-////        dm.dropAllTables();
-////        dm.createAllTables();
-////        for (int i = 0; i < classes.size(); i++){
-////            dm.addClassToDatabase(classes.get(i), i);
-////        }
-//
-////        search = new Search();
-//
-////        Javalin app = Javalin.create(config -> {
-////            config.bundledPlugins.enableCors(cors -> {
-////                cors.addRule(it -> {
-////                    it.allowHost("http://localhost:4200");
-////                });
-////            });
-////        }).start(7070);
-//
+
+//        search = new Search();
+
 //        Javalin app = Javalin.create(config -> {
 //            config.bundledPlugins.enableCors(cors -> {
 //                cors.addRule(it -> {
@@ -65,12 +57,20 @@ public class Main {
 //                });
 //            });
 //        }).start(7070);
-//
-//        sc.registerRoutes(app);
-//        ac.registerRoutes(app);
-//        scc.registerRoutes(app);
 
-        run();
+        Javalin app = Javalin.create(config -> {
+            config.bundledPlugins.enableCors(cors -> {
+                cors.addRule(it -> {
+                    it.allowHost("http://localhost:4200");
+                });
+            });
+        }).start(7070);
+
+        sc.registerRoutes(app);
+        ac.registerRoutes(app);
+        scc.registerRoutes(app);
+
+        //run();
 
         System.out.println("To exit the application: type 'e'");
         Scanner scan = new Scanner(System.in);

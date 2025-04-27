@@ -12,8 +12,8 @@ public class CustomEventsController {
     }
 
     public void registerRoutes(Javalin app) {
-        app.get("/scheduleEditor", this::addCustomEvent);
-        app.delete("/scheduleEditor", this::deleteCustomEvent);
+        app.get("/customEvents", this::addCustomEvent);
+        app.delete("/customEvents", this::deleteCustomEvent);
     }
 
     private void addCustomEvent(Context con) {

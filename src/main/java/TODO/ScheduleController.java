@@ -93,6 +93,7 @@ public class ScheduleController {
         String scheduleName = con.queryParam("name");
         int[] classes = con.bodyAsClass(int[].class); // Assuming the array of class IDs is sent in the request body
 
+
         if (username == null || scheduleName == null || classes == null) {
             con.status(400).result("Invalid input. Username, schedule name, and classes are required.");
             return;
