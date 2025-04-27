@@ -3,6 +3,9 @@ package TODO;
 import com.google.gson.*;
 
 import java.sql.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -477,96 +480,150 @@ public class DatabaseManager {
 //    }
 
     //search method
-    public JsonArray search(String name){ //, String
-        String search_classes = "SELECT id,name,subject,number,section,semester FROM classes WHERE name LIKE ?"; //"SELECT id,name,subject,number,section,semester FROM classes WHERE name LIKE ? AND subject LIKE ?";
+    public JsonArray search(String name, String subject, String dayTime, String startTime, String endTime) {
+        String search_classes = "SELECT id,name,subject,number,section,semester FROM classes WHERE name LIKE ? AND subject LIKE ?";
         String search_classTimes = "SELECT * FROM classTimes WHERE id=?";
         String search_faculty = "SELECT * FROM faculty WHERE id=?";
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
         int classID = 0;
+        boolean dayIncluded = false;
+        boolean withinTime = true;
 
         JsonArray searchResults = new JsonArray();
         String colName = "";
         Object value = null;
 
-        try(PreparedStatement classPrep = db.prepareStatement(search_classes)){
-            classPrep.setString(1, "%" + name + "%");
-            ResultSet classResults = classPrep.executeQuery();
+        try{
 
-            ResultSetMetaData classMD= classResults.getMetaData();
-            int numClassCols = classMD.getColumnCount();
+            LocalTime start = null;
+            LocalTime end = null;
 
-            //TODO: add filters here
-
-            /*iterate through the classes to get their times and faculty and
-            * return them in json format*/
-
-            while(classResults.next()){
-                classID = classResults.getInt("id");
-                JsonArray times = new JsonArray();
-                JsonArray facs = new JsonArray();
-
-                JsonObject classObj = new JsonObject();
-                for(int i = 1; i <= numClassCols; i++){
-                    colName = classMD.getColumnName(i);
-                    value = classResults.getObject(i);
-                    classObj.addProperty(colName, value != null ? value.toString() : null);
-                }
-
-                //add classTIme and faculty properties
-
-                //get the classTimes of the class
-                try(PreparedStatement timesPrep = db.prepareStatement(search_classTimes)){
-                    timesPrep.setInt(1, classID);
-                    ResultSet timeResults = timesPrep.executeQuery();
-
-                    ResultSetMetaData timeMD= timeResults.getMetaData();
-                    int numTimeCols = timeMD.getColumnCount();
-
-                    while(timeResults.next()){
-                        JsonObject classTimeObj = new JsonObject();
-                        for(int i = 2; i <= numTimeCols; i++){
-                            colName = timeMD.getColumnName(i);
-                            value = timeResults.getObject(i);
-                            classTimeObj.addProperty(colName, value != null ? value.toString() : null);
-                        }
-                        times.add(classTimeObj);
-                    }
-                    classObj.add("classTimes", times);
-
-                    //classObj.addProperty("", )
-                }catch (SQLException e){
-                    System.out.println("Error searching the classTimes table: " + e.getMessage());
-                }
-
-                //get the faculty of the class
-                try(PreparedStatement facPrep = db.prepareStatement(search_faculty)){
-                    facPrep.setInt(1, classID);
-                    ResultSet facResults = facPrep.executeQuery();
-
-                    ResultSetMetaData facMD= facResults.getMetaData();
-                    int numFacCols = facMD.getColumnCount();
-
-                    while(facResults.next()){
-                        JsonObject facultyObj = new JsonObject();
-                        for(int i = 2; i <= numFacCols; i++){
-                            colName = facMD.getColumnName(i);
-                            value = facResults.getObject(i);
-                            facultyObj.addProperty(colName, value != null ? value.toString() : null);
-                        }
-                        facs.add(facultyObj);
-                    }
-                    classObj.add("faculty", facs);
-
-                }catch (SQLException e){
-                    System.out.println("Error searching the faculty table: " + e.getMessage());
-                }
-
-                searchResults.add(classObj);
+            if(!startTime.equals(":00")){
+                start = LocalTime.parse(startTime, formatter);
             }
-        }catch (SQLException e){
-            System.out.println("Error searching the classes table: " + e.getMessage());
+            if(!endTime.equals(":00")){
+                end = LocalTime.parse(endTime, formatter);
+            }
+
+            try(PreparedStatement classPrep = db.prepareStatement(search_classes)){
+                classPrep.setString(1, "%" + name + "%");
+                classPrep.setString(2, "%" + subject + "%");
+                ResultSet classResults = classPrep.executeQuery();
+
+                //TODO: add filters here
+                //filter out the class ids that are not in the given time range and do not have the correct date
+
+
+                ResultSetMetaData classMD= classResults.getMetaData();
+                int numClassCols = classMD.getColumnCount();
+
+                /*iterate through the classes to get their times and faculty and
+                 * return them in json format*/
+
+                while(classResults.next()){
+                    classID = classResults.getInt("id");
+                    JsonArray times = new JsonArray();
+                    JsonArray facs = new JsonArray();
+
+                    JsonObject classObj = new JsonObject();
+                    for(int i = 1; i <= numClassCols; i++){
+                        colName = classMD.getColumnName(i);
+                        value = classResults.getObject(i);
+                        classObj.addProperty(colName, value != null ? value.toString() : null);
+                    }
+
+                    //part of day filter
+                    if(dayTime.equals("")){
+                        dayIncluded = true;
+                    }
+
+                    //add classTIme and faculty properties
+
+                    //get the classTimes of the class
+                    try(PreparedStatement timesPrep = db.prepareStatement(search_classTimes)){
+                        timesPrep.setInt(1, classID);
+                        ResultSet timeResults = timesPrep.executeQuery();
+
+                        ResultSetMetaData timeMD= timeResults.getMetaData();
+                        int numTimeCols = timeMD.getColumnCount();
+
+                        while(timeResults.next()){
+                            JsonObject classTimeObj = new JsonObject();
+                            for(int i = 2; i <= numTimeCols; i++){
+                                colName = timeMD.getColumnName(i);
+                                value = timeResults.getObject(i);
+                                classTimeObj.addProperty(colName, value != null ? value.toString() : null);
+
+                                //date filter
+                                if(colName.equals("day") && dayIncluded != true){
+                                    for(int k = 0; k < dayTime.length(); k++){
+                                        if(value.toString().charAt(0) == dayTime.charAt(k)){
+                                            dayIncluded = true;
+                                        }
+                                    }
+                                }
+                            }
+
+                            //classtime filter
+                            LocalTime startTimeObj = LocalTime.parse(timeResults.getString("start_time"), formatter);
+                            LocalTime endTimeObj = LocalTime.parse(timeResults.getString("end_time"), formatter);
+
+                            if(end == null || start == null) {
+                                withinTime = true;
+                            }else if(startTimeObj.isBefore(start) || endTimeObj.isAfter(end)){
+                                withinTime = false;
+                            }
+
+                            times.add(classTimeObj);
+                        }
+                        classObj.add("classTimes", times);
+
+                        //classObj.addProperty("", )
+                    }catch (SQLException e){
+                        System.out.println("Error searching the classTimes table: " + e.getMessage());
+                    }
+
+                    //get the faculty of the class
+                    try(PreparedStatement facPrep = db.prepareStatement(search_faculty)){
+                        facPrep.setInt(1, classID);
+                        ResultSet facResults = facPrep.executeQuery();
+
+                        ResultSetMetaData facMD= facResults.getMetaData();
+                        int numFacCols = facMD.getColumnCount();
+
+                        while(facResults.next()){
+                            JsonObject facultyObj = new JsonObject();
+                            for(int i = 2; i <= numFacCols; i++){
+                                colName = facMD.getColumnName(i);
+                                value = facResults.getObject(i);
+                                facultyObj.addProperty(colName, value != null ? value.toString() : null);
+                            }
+                            facs.add(facultyObj);
+                        }
+                        classObj.add("faculty", facs);
+
+                    }catch (SQLException e){
+                        System.out.println("Error searching the faculty table: " + e.getMessage());
+                    }
+
+                    if(dayIncluded && withinTime){
+                        searchResults.add(classObj);
+                    }
+                    dayIncluded = false;
+                    withinTime = true;
+                }
+            }catch (SQLException e){
+                System.out.println("Error searching the classes table: " + e.getMessage());
+            }
+
+        } catch (DateTimeParseException e) {
+            System.out.println("Time filter exception: " + e);
         }
 
         return searchResults;
+
     }
 
 
