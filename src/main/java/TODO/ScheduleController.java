@@ -1,5 +1,6 @@
 package TODO;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -91,8 +92,15 @@ public class ScheduleController {
     private void updateSchedule(Context con) {
         String username = con.queryParam("username");
         String scheduleName = con.queryParam("name");
-        JsonObject body = con.bodyAsClass(JsonObject.class); // Get body as JsonObject
-        JsonArray classesArray = body.getAsJsonArray("classes"); // Extract classes array
+        String body = con.body(); // Get body as JsonObject
+        System.out.println(body);
+        // convert "classes" from body to array of integers called classIds
+
+        JsonObject jsonBody = new Gson().fromJson(body, JsonObject.class);
+        JsonArray classesArray = jsonBody.getAsJsonArray("classes");
+        int[] classIds = StreamSupport.stream(classesArray.spliterator(), false)
+                .mapToInt(JsonElement::getAsInt)
+                .toArray();
 
         if (username == null || scheduleName == null || classesArray == null) {
             con.status(400).result("Invalid input. Username, schedule name, and classes are required.");
