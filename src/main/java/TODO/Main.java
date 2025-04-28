@@ -39,7 +39,7 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-       // add all classes to the database
+        //add all classes to the database
 //        dm.dropAllTables();
 //        dm.createAllTables();
 //        for (int i = 0; i < classes.size(); i++){
