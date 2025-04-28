@@ -25,6 +25,8 @@ public class ScheduleController {
         app.post("/schedule", this::addSchedule);
         app.delete("/schedule", this::deleteSchedule);
         app.put("/schedule", this::updateSchedule);
+        app.get("/schedule-editor", this::addCustomEvent);
+        app.delete("/schedule-editor", this::deleteCustomEvent);
     }
 
     private void getAllSchedules(Context con){
@@ -60,10 +62,26 @@ public class ScheduleController {
                 }
             }
 
+            // Extract custom events
+            // Extract classes
+            ArrayList<Map<String, Object>> customEvents = new ArrayList<>();
+            if (schedule.getAsJsonObject().has("customEvents")) {
+                JsonArray eventArray = schedule.getAsJsonObject().get("customEvents").getAsJsonArray();
+                for (JsonElement eventElement : eventArray) {
+                    Map<String, Object> eventMap = new HashMap<>();
+                    JsonObject classObj = eventElement.getAsJsonObject();
+                    for (Map.Entry<String, JsonElement> entry : classObj.entrySet()) {
+                        eventMap.put(entry.getKey(), entry.getValue().getAsString());
+                    }
+                    customEvents.add(eventMap);
+                }
+            }
+
             // Create a schedule map
             Map<String, Object> scheduleMap = new HashMap<>();
             scheduleMap.put("name", name);
             scheduleMap.put("classes", classes);
+            scheduleMap.put("customEvents", customEvents);
 
             formattedSchedules.add(scheduleMap);
         }
@@ -124,4 +142,25 @@ public class ScheduleController {
         }
     }
 
+    private void addCustomEvent(Context con) {
+        String username = con.queryParam("username");
+        String scheduleName = con.queryParam("account");
+        String eventName = con.queryParam("eventName");
+        String day = con.queryParam("day");
+        String startTime = con.queryParam("startTime");
+        String endTime = con.queryParam("endTime");
+        String location = con.queryParam("location");
+
+        int CustomEventId = dm.addCustomEvent(username, scheduleName, eventName, day, startTime, endTime, location);
+
+        con.json(CustomEventId);
+    }
+
+    private void deleteCustomEvent(Context con) {
+        int id = Integer.parseInt(con.queryParam("id"));
+
+        Boolean deleteCustomEventResult = dm.removeCustomEvent(id);
+
+        con.json(deleteCustomEventResult);
+    }
 }
