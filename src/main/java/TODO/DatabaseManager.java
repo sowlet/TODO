@@ -630,7 +630,7 @@ public class DatabaseManager {
     public JsonArray getSchedules(String username){
         String search_schedules = "SELECT scheduleName FROM schedules WHERE username=?";
 //        String search_scheduledClasses = "SELECT id FROM scheduledClasses WHERE username=?";
-        String search_classes = "SELECT classes.id,classes.name,classes.subject,classes.number,classes.section FROM classes JOIN scheduledClasses ON classes.id = scheduledClasses.id WHERE scheduledClasses.username=? AND scheduledClasses.scheduleName=?";
+        String search_classes = "SELECT classes.id,classes.name,classes.subject,classes.number,classes.section,classes.semester FROM classes JOIN scheduledClasses ON classes.id = scheduledClasses.id WHERE scheduledClasses.username=? AND scheduledClasses.scheduleName=?";
         String search_classTimes = "SELECT day,start_time,end_time FROM classTimes WHERE id=?";
 
         String nameS = "";
