@@ -30,6 +30,8 @@ public class SearchController {
         String endTime = con.queryParam("endTime") + ":00";
         JsonArray res = dm.search(query, semester, subject, dayTime, startTime, endTime);
 
+        System.out.println(semester);
+
         if (res == null || res.size() == 0) {
             con.result("No classes found.");
             if(res != null){
