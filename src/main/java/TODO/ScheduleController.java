@@ -49,6 +49,7 @@ public class ScheduleController {
         for (JsonElement schedule : schedules) {
             // Extract schedule name
             String name = schedule.getAsJsonObject().get("name").getAsString();
+            String semester = schedule.getAsJsonObject().get("semester").getAsString();
 
             // Extract classes
             ArrayList<Map<String, Object>> classes = new ArrayList<>();
@@ -94,6 +95,7 @@ public class ScheduleController {
             // Create a schedule map
             Map<String, Object> scheduleMap = new HashMap<>();
             scheduleMap.put("name", name);
+            scheduleMap.put("semester", semester);
             scheduleMap.put("classes", classes);
             scheduleMap.put("customEvents", customEvents);
 

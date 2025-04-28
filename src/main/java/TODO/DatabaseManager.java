@@ -109,6 +109,9 @@ public class DatabaseManager {
 
     //drop all tables
     public void dropAllTables(){
+        String disableForeignKeys = "PRAGMA foreign_keys=OFF";
+        String enableForeignKeys = "PRAGMA foreign_keys=ON";
+
         String drop_classes_table = "DROP TABLE IF EXISTS classes";
         String drop_classTimes_table = "DROP TABLE IF EXISTS classTimes";
         String drop_faculty_table = "DROP TABLE IF EXISTS faculty";
@@ -121,16 +124,18 @@ public class DatabaseManager {
         String drop_customEventsTimes_table = "DROP TABLE IF EXISTS customEventsTimes";
 
         try(Statement stat = db.createStatement()){
-            stat.execute(drop_classes_table);
-            stat.execute(drop_classTimes_table);
-            stat.execute(drop_faculty_table);
+            stat.execute(disableForeignKeys);
+            stat.execute(drop_customEventsTimes_table);
+            stat.execute(drop_customEvents_table);
+            stat.execute(drop_majorsAndMinors_table);
+            stat.execute(drop_scheduledClasses_table);
+            stat.execute(drop_schedules_table);
             stat.execute(drop_accounts_table);
             stat.execute(drop_classesTaken_table);
-            stat.execute(drop_schedules_table);
-            stat.execute(drop_scheduledClasses_table);
-            stat.execute(drop_majorsAndMinors_table);
-            stat.execute(drop_customEvents_table);
-            stat.execute(drop_customEventsTimes_table);
+            stat.execute(drop_faculty_table);
+            stat.execute(drop_classTimes_table);
+            stat.execute(drop_classes_table);
+            stat.execute(enableForeignKeys);
         } catch (SQLException e) {
             System.out.println("Error creating tables: " + e.getMessage());
         }
@@ -483,7 +488,7 @@ public class DatabaseManager {
 
     //search method
     public JsonArray search(String name, String semester, String subject, String dayTime, String startTime, String endTime) {
-        String search_classes = "SELECT id,name,subject,number,section,semester FROM classes WHERE name LIKE ? AND subject LIKE ? AND semester LIKE ?";
+        String search_classes = "SELECT id,name,semester,subject,number,section FROM classes WHERE name LIKE ? AND subject LIKE ? AND semester LIKE ?";
         String search_classTimes = "SELECT * FROM classTimes WHERE id=?";
         String search_faculty = "SELECT * FROM faculty WHERE id=?";
 
@@ -631,7 +636,7 @@ public class DatabaseManager {
 
 
     public JsonArray getSchedules(String username){
-        String search_schedules = "SELECT scheduleName FROM schedules WHERE username=?";
+        String search_schedules = "SELECT scheduleName,semester FROM schedules WHERE username=?";
 //        String search_scheduledClasses = "SELECT id FROM scheduledClasses WHERE username=?";
         String search_classes = "SELECT classes.id,classes.name,classes.subject,classes.number,classes.section,classes.semester FROM classes JOIN scheduledClasses ON classes.id = scheduledClasses.id WHERE scheduledClasses.username=? AND scheduledClasses.scheduleName=?";
         String search_classTimes = "SELECT day,start_time,end_time FROM classTimes WHERE id=?";
@@ -645,17 +650,18 @@ public class DatabaseManager {
         try(PreparedStatement schedPrep = db.prepareStatement(search_schedules)){
             schedPrep.setString(1, username);
             ResultSet schedResults = schedPrep.executeQuery();
-
             ResultSetMetaData schedMD= schedResults.getMetaData();
             int numSchedCols = schedMD.getColumnCount();
 
             while(schedResults.next()){
                 nameS = schedResults.getString("scheduleName");
+                System.out.println(nameS);
+                String semester = schedResults.getString("semester");
                 JsonArray classes = new JsonArray();
                 JsonArray times = new JsonArray();
-
                 JsonObject schedObj = new JsonObject();
                 schedObj.addProperty("name", nameS);
+                schedObj.addProperty("semester", semester);
 
                 //get the faculty of the class
                 try(PreparedStatement classPrep = db.prepareStatement(search_classes)){
