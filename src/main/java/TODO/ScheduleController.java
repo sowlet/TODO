@@ -89,7 +89,8 @@ public class ScheduleController {
     private void addSchedule(Context con){
         String username = con.queryParam("username");
         String scheduleName = con.queryParam("name");
-        Boolean addScheduleResult = dm.addScheduleToDatabase(username, scheduleName);
+        String scheduleSem = con.queryParam("semester");
+        Boolean addScheduleResult = dm.addScheduleToDatabase(username, scheduleName, scheduleSem);
 
         con.json(addScheduleResult);
     }

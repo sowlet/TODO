@@ -64,6 +64,7 @@ public class DatabaseManager {
     String create_schedules_table = "CREATE TABLE IF NOT EXISTS schedules (\n"
             + "username TEXT NOT NULL,\n"
             + "scheduleName TEXT NOT NULL,\n"
+            + "semester TEXT NOT NULL,\n"
             + "PRIMARY KEY (username, scheduleName),\n"
             + "FOREIGN KEY (username) REFERENCES accounts(username)\n)";
 
@@ -308,7 +309,7 @@ public class DatabaseManager {
         }
     }
 
-    public Boolean addScheduleToDatabase(String username, String name) {
+    public Boolean addScheduleToDatabase(String username, String name, String semester) {
         String get_schedule = "SELECT scheduleName FROM schedules WHERE username=? and scheduleName=?";
 
         try (PreparedStatement prep = db.prepareStatement(get_schedule)) {
@@ -322,11 +323,12 @@ public class DatabaseManager {
             System.out.println("Error adding to the schedule table: " + e.getMessage());
         }
 
-        String insert_schedule = "INSERT INTO schedules (username, scheduleName) VALUES (?,?)";
+        String insert_schedule = "INSERT INTO schedules (username, scheduleName, semester) VALUES (?,?,?)";
 
         try (PreparedStatement prep = db.prepareStatement(insert_schedule)) {
             prep.setString(1, username);
             prep.setString(2, name);
+            prep.setString(3, semester);
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding to the schedules table: " + e.getMessage());
@@ -480,8 +482,8 @@ public class DatabaseManager {
 //    }
 
     //search method
-    public JsonArray search(String name, String subject, String dayTime, String startTime, String endTime) {
-        String search_classes = "SELECT id,name,subject,number,section,semester FROM classes WHERE name LIKE ? AND subject LIKE ?";
+    public JsonArray search(String name, String semester, String subject, String dayTime, String startTime, String endTime) {
+        String search_classes = "SELECT id,name,subject,number,section,semester FROM classes WHERE name LIKE ? AND subject LIKE ? AND semester LIKE ?";
         String search_classTimes = "SELECT * FROM classTimes WHERE id=?";
         String search_faculty = "SELECT * FROM faculty WHERE id=?";
 
@@ -510,6 +512,7 @@ public class DatabaseManager {
             try(PreparedStatement classPrep = db.prepareStatement(search_classes)){
                 classPrep.setString(1, "%" + name + "%");
                 classPrep.setString(2, "%" + subject + "%");
+                classPrep.setString(3, "%" + semester + "%");
                 ResultSet classResults = classPrep.executeQuery();
 
                 //TODO: add filters here
