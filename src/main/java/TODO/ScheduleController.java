@@ -1,5 +1,6 @@
 package TODO;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,6 +11,7 @@ import io.javalin.json.JsonMapper;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 
@@ -54,7 +56,19 @@ public class ScheduleController {
                     Map<String, Object> classMap = new HashMap<>();
                     JsonObject classObj = classElement.getAsJsonObject();
                     for (Map.Entry<String, JsonElement> entry : classObj.entrySet()) {
-                        classMap.put(entry.getKey(), entry.getValue().getAsString());
+                        JsonElement value = entry.getValue();
+                        if (value.isJsonArray()) {
+                            // Handle array values
+                            JsonArray array = value.getAsJsonArray();
+                            List<String> list = new ArrayList<>();
+                            for (JsonElement element : array) {
+                                list.add(element.toString());
+                            }
+                            classMap.put(entry.getKey(), list);
+                        } else {
+                            // Handle non-array values
+                            classMap.put(entry.getKey(), value.getAsString());
+                        }
                     }
                     classes.add(classMap);
                 }
@@ -89,11 +103,20 @@ public class ScheduleController {
     }
 
     private void updateSchedule(Context con) {
+        boolean successful = false;
         String username = con.queryParam("username");
         String scheduleName = con.queryParam("name");
-        int[] classes = con.bodyAsClass(int[].class); // Assuming the array of class IDs is sent in the request body
+        String body = con.body(); // Get body as JsonObject
+        System.out.println(body);
+        // convert "classes" from body to array of integers called classIds
 
-        if (username == null || scheduleName == null || classes == null) {
+        JsonObject jsonBody = new Gson().fromJson(body, JsonObject.class);
+        JsonArray classesArray = jsonBody.getAsJsonArray("classes");
+        int[] classIds = StreamSupport.stream(classesArray.spliterator(), false)
+                .mapToInt(JsonElement::getAsInt)
+                .toArray();
+
+        if (username == null || scheduleName == null || classesArray == null) {
             con.status(400).result("Invalid input. Username, schedule name, and classes are required.");
             return;
         }
@@ -113,13 +136,18 @@ public class ScheduleController {
             }
 
             // Add new classes to the schedule
-            for (int classID : classes) {
+            for (JsonElement classElement : classesArray) {
+                int classID = classElement.getAsInt();
+                System.out.println(classID);
                 dm.addClassToSchedule(username, scheduleName, classID);
             }
 
-            con.status(200).result("Schedule updated successfully.");
+            successful = true;
+            con.json(successful);
+            System.out.println("Schedule updated successfully.");
         } catch (Exception e) {
-            con.status(500).result("An error occurred while updating the schedule: " + e.getMessage());
+            con.json(successful);
+            System.out.println("An error occurred while updating the schedule: " + e.getMessage());
         }
     }
 

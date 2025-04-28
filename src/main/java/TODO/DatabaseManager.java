@@ -678,18 +678,30 @@ public class DatabaseManager {
                             timesPrep.setInt(1, classID);
                             ResultSet timeResults = timesPrep.executeQuery();
 
+                            String days = "";
+                            String start_time = "";
+                            String end_time = "";
+
                             ResultSetMetaData timeMD= timeResults.getMetaData();
                             int numTimeCols = timeMD.getColumnCount();
 
                             while(timeResults.next()){
+                                days += timeResults.getString("day");
+                                if (start_time.isEmpty()) {
+                                    start_time = timeResults.getString("start_time");
+                                    end_time = timeResults.getString("end_time");
+                                }
                                 JsonObject classTimeObj = new JsonObject();
                                 for(int i = 2; i <= numTimeCols; i++){
                                     colName = timeMD.getColumnName(i);
                                     value = timeResults.getObject(i);
                                     classTimeObj.addProperty(colName, value != null ? value.toString() : null);
                                 }
-                                times.add(classTimeObj);
+                                times.add(classTimeObj.toString());
                             }
+                            classObj.addProperty("days", days);
+                            classObj.addProperty("startTime", start_time);
+                            classObj.addProperty("endTime", end_time);
                             classObj.add("classTimes", times);
 
                         }catch (SQLException e){
