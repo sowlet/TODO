@@ -23,11 +23,12 @@ public class SearchController {
 
     private void handleSearch(Context con) throws NullPointerException{
         String query = con.queryParam("query");
+        String semester = con.queryParam("semester");
         String subject = con.queryParam("subject");
         String dayTime = con.queryParam("days");
         String startTime = con.queryParam("startTime") + ":00";
         String endTime = con.queryParam("endTime") + ":00";
-        JsonArray res = dm.search(query, subject, dayTime, startTime, endTime);
+        JsonArray res = dm.search(query, semester, subject, dayTime, startTime, endTime);
 
         if (res == null || res.size() == 0) {
             con.result("No classes found.");
