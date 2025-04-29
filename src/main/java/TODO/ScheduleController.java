@@ -27,8 +27,8 @@ public class ScheduleController {
         app.post("/schedule", this::addSchedule);
         app.delete("/schedule", this::deleteSchedule);
         app.put("/schedule", this::updateSchedule);
-        app.get("/schedule-editor", this::addCustomEvent);
-        app.delete("/schedule-editor", this::deleteCustomEvent);
+        app.post("/schedule-ce", this::addCustomEvent);
+        app.delete("/schedule-ce", this::deleteCustomEvent);
     }
 
     private void getAllSchedules(Context con){
@@ -182,7 +182,7 @@ public class ScheduleController {
         String location = con.queryParam("location");
 
         int CustomEventId = dm.addCustomEvent(username, scheduleName, eventName, day, startTime, endTime, location);
-
+        System.out.println("Created custom event with ID: " + CustomEventId);
         con.json(CustomEventId);
     }
 
