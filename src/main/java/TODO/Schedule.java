@@ -28,6 +28,14 @@ public class Schedule {
         return customEvents;
     }
 
+    public String getCustomEventsString() {
+        String ce = "";
+        for (CustomEvents events : customEvents) {
+             ce = ce + "\n" + events.toString();
+        }
+        return ce;
+    }
+
     public String getName() {
         return name;
     }
@@ -59,10 +67,11 @@ public class Schedule {
         if(hasClass(c)) {
             //If this works
             classes.remove(c);
-
-
         }
     }
+
+
+
 
     /*
     returns whether the schedule has a Class object or not
@@ -81,6 +90,43 @@ public class Schedule {
         return false;
     }
 
+    /*
+    adds customEvent if there are no conflicts
+
+    @param c customEvent object to be added
+     */
+    public void addCustomEvent(CustomEvents c) {
+        if (!hasTimeConflict(c)) {
+            customEvents.add(c);
+        }
+    }
+
+    /*
+    removes a given customEvent from schedule
+
+    @param c CustomEvent object to be added
+     */
+    public void removeCustomEvent(CustomEvents c){
+        if(hasCustomEvent(c)) {
+            //If this works
+            customEvents.remove(c);
+        }
+    }
+
+    /*
+    returns whether the customEvents list has a customEvents object or not
+
+    @param c customEvents object to check
+    @return true if the schedule contains the event or false if the schedule does not contain the event
+     */
+    public boolean hasCustomEvent(CustomEvents c){
+        for (Class scheduleClass: classes) {
+            if (c.equals(scheduleClass)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /*
     checks whether the given class conflicts with any classes in the schedule
@@ -91,6 +137,31 @@ public class Schedule {
     public boolean hasTimeConflict(Class c) {
         for (Class scheduleClass: classes) {
             if (scheduleClass.hasTimeConflict(c)) {
+                return true;
+            }
+        }
+        for (CustomEvents scheduledEvent : customEvents) {
+            if (scheduledEvent.hasTimeConflict(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*
+    checks whether the given custom event conflicts with any custom events in the schedule
+
+    @param event custom event to be checked
+    @return true if there is a conflict between the given custom event and the rest within the schedule or false otherwise
+    */
+    public boolean hasTimeConflict(CustomEvents event) {
+        for (CustomEvents scheduledEvent : customEvents) {
+            if (scheduledEvent.hasTimeConflict(event)) {
+                return true;
+            }
+        }
+        for (Class scheduleClass: classes) {
+            if (scheduleClass.hasTimeConflict(event)) {
                 return true;
             }
         }

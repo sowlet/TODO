@@ -3,6 +3,8 @@ package TODO;
 import java.io.*;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import com.google.gson.*;
@@ -40,11 +42,11 @@ public class Main {
         }
 
         //add all classes to the database
-//        dm.dropAllTables();
-//        dm.createAllTables();
-//        for (int i = 0; i < classes.size(); i++){
-//            dm.addClassToDatabase(classes.get(i), i);
-//        }
+        dm.dropAllTables();
+        dm.createAllTables();
+        for (int i = 0; i < classes.size(); i++){
+            dm.addClassToDatabase(classes.get(i), i);
+        }
 
 //        search = new Search();
 
@@ -267,6 +269,10 @@ public class Main {
     }
 
     private static void viewSchedule(Scanner scan, Account currentAccount) {
+        if (currentAccount.schedules == null || currentAccount.schedules.isEmpty()) {
+            System.out.println("No schedules available to view.");
+            return;
+        }
         System.out.println("Enter the name of the schedule you would like to view: ");
 
         // display schedules
@@ -468,6 +474,20 @@ public class Main {
                 }
             }
 
+            for (CustomEvents c : schedule.getCustomEvents()) {
+                for (ClassTime t : c.getTimes()) {
+                    if (t.getStartTime().equals(time)) {
+                        switch (t.getDay()) {
+                            case "M": days[0] = c.getName().substring(0, 10) + " " + c.getLocation().substring(0, 5); break;
+                            case "T": days[1] = c.getName().substring(0, 10) + " " + c.getLocation().substring(0, 5); break;
+                            case "W": days[2] = c.getName().substring(0, 10) + " " + c.getLocation().substring(0, 5); break;
+                            case "R": days[3] = c.getName().substring(0, 10) + " " + c.getLocation().substring(0, 5); break;
+                            case "F": days[4] = c.getName().substring(0, 10) + " " + c.getLocation().substring(0, 5); break;
+                        }
+                    }
+                }
+            }
+
             if (i % 2 == 1) time = "";
             System.out.printf("%-10s|%-20s|%-20s|%-20s|%-20s|%-20s%n", time, days[0], days[1], days[2], days[3], days[4]);
         }
@@ -529,7 +549,7 @@ public class Main {
             String input;
             label:
             while (true) {
-                System.out.println("Editing schedule: " + currentlyEditing.getName() +  "\n" + currentlyEditing.getClasses().toString() + "\nTo add a class: type 'a'\nTo remove a class: type 'r'\nTo go back: type 'b'");
+                System.out.println("Editing schedule: " + currentlyEditing.getName() +  "\n" + currentlyEditing.getClasses().toString() + "\n" + currentlyEditing.getCustomEvents().toString() + "\nTo add a class: type 'a'\nTo remove a class: type 'r'\nTo add a custom event: type 'c'\nTo remove a custom event: type 'e'\nTo go back: type 'b'");
                 input = scan.nextLine();
 
                 switch (input) {
@@ -538,6 +558,12 @@ public class Main {
                         break;
                     case "r":
                         removeClassFromSchedule(scan);
+                        break;
+                    case "c":
+                        addCustomEventToSchedule(scan);
+                        break;
+                    case "e":
+                        removeCustomEventFromSchedule(scan);
                         break;
                     case "b":
                         break label;
@@ -647,6 +673,94 @@ public class Main {
         } catch (Exception e){
             System.out.println(e.getMessage());
             search.removeFilter(new TimeFilter("00:00:00", "00:00:00"));
+        }
+    }
+
+    private static void addCustomEventToSchedule(Scanner scan) {
+        System.out.println("Enter custom event name: ");
+        String name = scan.nextLine();
+        System.out.println("Enter custom event location (space for no location): ");
+        String location = scan.nextLine();
+        System.out.println("Enter day of the event (M, T, W, R, F): ");
+        char day = scan.nextLine().toUpperCase().charAt(0);
+        if(day != 'M' && day != 'T' && day != 'W' && day != 'R' && day != 'F') {
+            System.out.println("Invalid day");
+            return;
+        }
+        System.out.println("Enter start time (HH:mm:ss): ");
+        String startTime = scan.nextLine();
+        if(!isValidTime(startTime)) {
+            System.out.println("Invalid time format. Please use HH:mm:ss");
+            return;
+        }
+        System.out.println("Enter end time (HH:mm:ss): ");
+        if(!isValidTime(startTime)) {
+            System.out.println("Invalid time format. Please use HH:mm:ss");
+            return;
+        }
+        String endTime = scan.nextLine();
+
+        ClassTime time;
+        try {
+            time = new ClassTime(day, startTime, endTime);
+        } catch (DateTimeParseException e) {
+            System.out.println("Error parsing date and time strings: " + e.getMessage());
+            return;
+        }
+
+        ClassTime[] times = {time};
+
+        CustomEvents event = new CustomEvents(name, location, times);
+        currentlyEditing.addCustomEvent(event);
+        System.out.println("Custom event successfully added to schedule!");
+    }
+
+    private static void removeCustomEventFromSchedule(Scanner scan) {
+        System.out.println("Enter custom event name: ");
+        String name = scan.nextLine();
+        System.out.println("Enter custom event location (space for no location): ");
+        String location = scan.nextLine();
+        System.out.println("Enter day of the event (M, T, W, R, F): ");
+        char day = scan.nextLine().toUpperCase().charAt(0);
+        if(day != 'M' && day != 'T' && day != 'W' && day != 'R' && day != 'F') {
+            System.out.println("Invalid day");
+            return;
+        }
+        System.out.println("Enter start time (HH:mm:ss): ");
+        String startTime = scan.nextLine();
+        if(!isValidTime(startTime)) {
+            System.out.println("Invalid time format. Please use HH:mm:ss");
+            return;
+        }
+        System.out.println("Enter end time (HH:mm:ss): ");
+        if(!isValidTime(startTime)) {
+            System.out.println("Invalid time format. Please use HH:mm:ss");
+            return;
+        }
+        String endTime = scan.nextLine();
+
+        ClassTime time;
+        try {
+            time = new ClassTime(day, startTime, endTime);
+        } catch (DateTimeParseException e) {
+            System.out.println("Error parsing date and time strings: " + e.getMessage());
+            return;
+        }
+
+        ClassTime[] times = {time};
+
+        CustomEvents event = new CustomEvents(name, location, times);
+        currentlyEditing.removeCustomEvent(event);
+        System.out.println("Custom event successfully removed from schedule!");
+    }
+
+    private static boolean isValidTime(String startTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        try {
+            LocalTime.parse(startTime, formatter);
+            return true; // Valid time
+        } catch (DateTimeParseException e) {
+            return false; // Invalid time
         }
     }
 

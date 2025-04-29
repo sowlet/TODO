@@ -6,8 +6,8 @@ public class ClassTime {
     private String end_time;
     private String start_time;
 
-    public ClassTime(String day, String end_time, String start_time){
-        this.day = day;
+    public ClassTime(char day, String end_time, String start_time){
+        this.day = Character.toString(day);
         this.end_time = end_time;
         this.start_time = start_time;
     }

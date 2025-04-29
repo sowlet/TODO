@@ -90,8 +90,8 @@ public class DatabaseManager {
             + "id INTEGER PRIMARY KEY AUTOINCREMENT,\n" //Custom events times table are referencing this table
             + "eventName TEXT NOT NULL,\n"
             + "location TEXT,\n"
-            + "FOREIGN KEY (username) REFERENCES schedules(username),\n"
-            + "FOREIGN KEY (scheduleName) REFERENCES schedules(scheduleName)\n)";
+            //+ "FOREIGN KEY (username, scheduleName) REFERENCES schedules(username, scheduleName),\n)";
+            + "FOREIGN KEY (username, scheduleName) REFERENCES schedules(username, scheduleName)\n)";
 
     String create_customEventsTimes_table = "CREATE TABLE IF NOT EXISTS customEventsTimes (\n"
             + "id INTEGER PRIMARY KEY AUTOINCREMENT, \n"
@@ -727,6 +727,7 @@ public class DatabaseManager {
                 }
 
                 scheduleResults.add(schedObj);
+
             }
         }catch (SQLException e){
             System.out.println("Error searching the schedules table: " + e.getMessage());
@@ -762,7 +763,7 @@ public class DatabaseManager {
         }
     }
 
-    public void addCustomEvent(String username, String scheduleName, String eventName, String location, String day, String startTime, String endTime) {
+    public int addCustomEvent(String username, String scheduleName, String eventName, String location, String day, String startTime, String endTime) {
         String insert_customEvent = "INSERT INTO customEvents (username, scheduleName, eventName, location) VALUES (?,?,?,?)";
 
         try (PreparedStatement prep = db.prepareStatement(insert_customEvent)) {
@@ -773,23 +774,38 @@ public class DatabaseManager {
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding to the customEvents table: " + e.getMessage());
+            return -1;
         }
 
-        String insert_customEventTimes = "INSERT INTO customEventsTimes (day, start_time, end_time) VALUES (?,?,?)";
+        String findId = "SELECT * FROM customEvents ORDER BY id DESC LIMIT 1";
+        int id = -1;
+        try (PreparedStatement prep = db.prepareStatement(findId)) {
+            ResultSet result = prep.executeQuery();
+            id = result.getInt("id");
+        } catch (SQLException e) {
+            System.out.println("Error finding id from the customEvents table: " + e.getMessage());
+            return id;
+        }
+
+        String insert_customEventTimes = "INSERT INTO customEventsTimes (id, day, start_time, end_time) VALUES (?,?,?,?)";
         try (PreparedStatement prep = db.prepareStatement(insert_customEventTimes)) {
-            prep.setString(1, day);
-            prep.setString(2, startTime);
-            prep.setString(3, endTime);
+            prep.setInt(1, id);
+            prep.setString(2, day);
+            prep.setString(3, startTime);
+            prep.setString(4, endTime);
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding to the customEventsTimes table: " + e.getMessage());
+            return -1;
         }
+
+        return id;
     }
 
     /*
     @param int id the id of the custom event to be removed
      */
-    public void removeCustomEvent(int id) {
+    public boolean removeCustomEvent(int id) {
         String delete_customEvent = "DELETE FROM customEvents WHERE id=?";
         String delete_customEventTime = "DELETE FROM customEventsTimes WHERE id=?";
 
@@ -798,6 +814,7 @@ public class DatabaseManager {
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error removing from the customEvents table: " + e.getMessage());
+            return false;
         }
 
 
@@ -806,7 +823,9 @@ public class DatabaseManager {
             prep.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error removing from the customEventsTimes table: " + e.getMessage());
+            return false;
         }
+        return true;
     }
 
     public Boolean validAccount(String username, String password) {
